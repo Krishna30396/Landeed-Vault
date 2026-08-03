@@ -1,0 +1,181 @@
+:root {
+  --paper:     #E9ECE4;  /* app background — cool paper-green, not cream */
+  --panel:     #FFFFFF;  /* cards, input surfaces */
+  --ink:       #1E2A24;  /* primary text — deep forest, never pure black */
+  --muted:     #6B7A70;  /* secondary text, labels */
+  --contour:   #C6D0C1;  /* hairlines, dividers, borders */
+  --marker:    #C51162;  /* THE midpoint. Nothing else. */
+  --route:     #2F6F5E;  /* selected route line */
+  --route-alt: #9FB0A6;  /* unselected alternate routes */
+  --error:     #8A3232;  /* error text ONLY — a state colour, not an accent */
+  /* --font-display / --font-body / --font-mono are set on <html> by next/font. */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body), 'Public Sans', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display), 'Bricolage Grotesque', sans-serif;
+  font-weight: 600;
+  margin: 0;
+}
+
+button {
+  font-family: inherit;
+}
+
+input {
+  font-family: inherit;
+}
+
+a {
+  color: var(--route);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Once a route is drawn the basemap goes quiet — streets fade to grey so the
+   route, hub and category pins are the only colour on the map. */
+.tiles-muted .leaflet-tile-pane {
+  filter: grayscale(0.92) saturate(0.3) brightness(1.04) contrast(0.92);
+}
+
+/* Candidate hub pins: a quiet dot with a slowly breathing ring. */
+.pulse-pin {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--route);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(30, 42, 36, 0.35);
+  position: relative;
+}
+
+.pulse-pin::after {
+  content: '';
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  border: 2px solid rgba(47, 111, 94, 0.55);
+  animation: hub-pulse 1.8s ease-out infinite;
+}
+
+@keyframes hub-pulse {
+  0% {
+    transform: scale(0.55);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-pin::after {
+    animation: none;
+    transform: scale(1);
+    opacity: 0.4;
+  }
+}
+
+/* Place popup — Leaflet's popup DOM lives outside CSS modules. */
+.leaflet-popup-content-wrapper {
+  background: var(--panel);
+  color: var(--ink);
+  border: 1px solid var(--contour);
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(30, 42, 36, 0.18);
+}
+
+.leaflet-popup-tip {
+  background: var(--panel);
+  border: 1px solid var(--contour);
+}
+
+.leaflet-popup-content {
+  margin: 12px 14px;
+  font-family: var(--font-body), 'Public Sans', system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.45;
+  min-width: 180px;
+}
+
+.place-popup strong {
+  font-size: 14.5px;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.place-popup-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+}
+
+.place-popup-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.place-popup-row {
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+.place-popup-hours {
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+.place-popup-links {
+  display: flex;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.place-popup-links a {
+  color: var(--route);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.place-popup-links a:hover {
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,122 @@
+.wrap {
+  position: relative;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.marker {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--ink);
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.marker[data-kind='b'] {
+  background: var(--ink);
+}
+
+.inputWrap {
+  position: relative;
+}
+
+.clear {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.clear:hover {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.input {
+  width: 100%;
+  padding: 10px 34px 10px 12px;
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--contour);
+  border-radius: 6px;
+}
+
+.input::placeholder {
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--ink);
+}
+
+.dropdown {
+  position: absolute;
+  z-index: 1200;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 4px 0 0;
+  padding: 4px;
+  list-style: none;
+  background: var(--panel);
+  border: 1px solid var(--contour);
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(30, 42, 36, 0.12);
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.item,
+.itemActive {
+  padding: 8px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.itemActive {
+  background: var(--paper);
+}
+
+.kind {
+  margin-left: 6px;
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.hint,
+.error {
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.error {
+  color: var(--error);
+}
