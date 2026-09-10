@@ -85,8 +85,8 @@ const DOCUMENTS = [
       uploadTitle: 'Add the latest receipt',
       uploadDesc: 'Upload the 2025 property tax receipt to keep your records up to date.',
       help: {
-        title: 'Not sure where to get it?',
-        desc: 'Terra can look up the latest property tax record from government sources for you.',
+        title: 'Need help finding it?',
+        desc: 'Terra can look it up from government records for you.',
       },
     },
   },
@@ -567,12 +567,12 @@ function DocumentUpdateModal({ doc, onClose }) {
               </div>
               <div className={s.umHelpBody}>
                 <div className={s.umHelpTitle}>
-                  {terraAsked ? 'Terra is on it' : (u.help?.title || 'Not sure where to get it?')}
+                  {terraAsked ? 'Terra is on it' : (u.help?.title || 'Need help finding it?')}
                 </div>
                 <div className={s.umHelpDesc}>
                   {terraAsked
-                    ? 'Terra is checking government sources for the latest record. We’ll add it here automatically once it’s found.'
-                    : (u.help?.desc || 'Terra can look up the latest record from government sources for you.')}
+                    ? 'Terra is checking government records — we’ll add it here automatically once it’s found.'
+                    : (u.help?.desc || 'Terra can look it up from government records for you.')}
                 </div>
               </div>
               {!terraAsked && (

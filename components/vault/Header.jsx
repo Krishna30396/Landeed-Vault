@@ -57,6 +57,8 @@ export default function Header({
           </div>
         )}
 
+        <div className={s.spacer} />
+
         <div className={s.actions}>
           <button
             className={s.iconBtn}

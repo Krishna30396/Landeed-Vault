@@ -45,6 +45,11 @@
   --color-info-bg:         #EBF4FF;
   --color-info-text:       #2C5282;
 
+  /* Terra / AI accent */
+  --color-ai:              #7C3AED;
+  --color-ai-bg:           #F4F0FE;
+  --color-ai-text:         #5B21B6;
+
   /* ── Color: Interactive ─────────────────────────────────── */
   --color-focus:           rgba(26, 107, 74, 0.4);
   --color-overlay:         rgba(0, 0, 0, 0.4);

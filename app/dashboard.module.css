@@ -6,7 +6,7 @@
 .main {
   max-width: var(--content-max-width);
   margin: 0 auto;
-  padding: var(--space-10) var(--content-padding) var(--space-20);
+  padding: 36px var(--content-padding) var(--space-20);
 }
 
 /* ── Greeting ──────────────────────────────────── */
@@ -15,7 +15,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: var(--space-10);
+  margin-bottom: var(--space-6);
   gap: var(--space-6);
 }
 
@@ -24,7 +24,7 @@
 }
 
 .greetingTitle {
-  font-size: 2rem;
+  font-size: var(--text-h1);
   font-weight: var(--weight-semibold);
   color: var(--color-text-primary);
   line-height: var(--leading-tight);
@@ -40,58 +40,45 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: var(--space-2);
+  gap: var(--space-3);
   flex-shrink: 0;
 }
 
-.greetingHint {
-  font-size: var(--text-caption);
-  color: var(--color-text-muted);
-  text-align: right;
-  max-width: 240px;
+.greetingAddBtn {
+  min-width: 220px;
 }
 
-/* ── Attention Banner ──────────────────────────── */
+.greetingHint {
+  font-size: var(--text-body-sm);
+  color: var(--color-text-muted);
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* ── Attention Banner (compact alert) ──────────── */
 
 .attention {
   display: flex;
   align-items: center;
-  gap: var(--space-5);
-  padding: var(--space-5) var(--space-6);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-subtle);
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-danger-bg);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 20%, transparent);
   border-radius: var(--radius-md);
-  margin-bottom: var(--space-10);
-  transition: box-shadow var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-8);
 }
 
-.attention:hover {
-  box-shadow: var(--shadow-md);
-}
-
-.attentionImage {
-  width: 88px;
-  height: 88px;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
+.attentionIcon {
   flex-shrink: 0;
-  background: var(--color-surface-subtle);
-}
-
-.attentionImage img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.attentionImagePlaceholder {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #8BC34A33 0%, #4CAF5033 50%, #2E7D3233 100%);
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-brand);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--color-danger);
+  color: #fff;
 }
 
 .attentionBody {
@@ -99,26 +86,11 @@
   min-width: 0;
 }
 
-.attentionLabel {
-  font-size: 0.6875rem;
-  font-weight: var(--weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--color-danger-text);
-  margin-bottom: var(--space-1);
-}
-
 .attentionTitle {
-  font-size: var(--text-h3);
+  font-size: var(--text-body);
   font-weight: var(--weight-semibold);
-  color: var(--color-text-primary);
-  margin-bottom: 2px;
-}
-
-.attentionLocation {
-  font-size: var(--text-body-sm);
-  color: var(--color-text-muted);
-  margin-bottom: var(--space-1);
+  color: var(--color-danger);
+  line-height: var(--leading-snug);
 }
 
 .attentionDesc {
@@ -127,37 +99,55 @@
   line-height: var(--leading-normal);
 }
 
-.attentionAction {
+.attentionReviewBtn {
   flex-shrink: 0;
-}
-
-.reviewBtn {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-5);
-  background: var(--color-danger);
-  color: #fff;
+  gap: 6px;
+  padding: var(--space-2) var(--space-3);
+  background: none;
+  color: var(--color-danger);
   font-family: var(--font-sans);
   font-size: var(--text-body-sm);
-  font-weight: var(--weight-medium);
+  font-weight: var(--weight-semibold);
   border: none;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background var(--transition-fast);
   white-space: nowrap;
+  transition: background var(--transition-fast);
 }
 
-.reviewBtn:hover {
-  background: #b12b2b;
+.attentionReviewBtn:hover {
+  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
 }
 
-.reviewArrow {
+.attentionReviewBtn span {
   transition: transform var(--transition-fast);
 }
 
-.reviewBtn:hover .reviewArrow {
+.attentionReviewBtn:hover span {
   transform: translateX(2px);
+}
+
+.attentionDismiss {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-danger-text);
+  opacity: 0.55;
+  cursor: pointer;
+  transition: opacity var(--transition-fast), background var(--transition-fast);
+}
+
+.attentionDismiss:hover {
+  opacity: 1;
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
 }
 
 /* ── Properties Section ────────────────────────── */
@@ -204,19 +194,35 @@
   color: var(--color-text-muted);
 }
 
+.sortLabel {
+  flex-shrink: 0;
+}
+
 .sortSelect {
   appearance: none;
-  background: none;
-  border: none;
   font-family: var(--font-sans);
   font-size: var(--text-body-sm);
   font-weight: var(--weight-medium);
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary);
   cursor: pointer;
-  padding-right: var(--space-4);
-  background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23868B88' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  padding: var(--space-2) 34px var(--space-2) var(--space-4);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-image: url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%234A4F4C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right center;
+  background-position: right var(--space-3) center;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.sortSelect:hover {
+  border-color: var(--color-text-muted);
+}
+
+.sortSelect:focus-visible {
+  outline: none;
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px var(--color-focus);
 }
 
 /* ── Property Card (Vertical / Dashboard) ──────── */
@@ -251,7 +257,7 @@
 
 .cardImageWrap {
   position: relative;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 2 / 1;
   overflow: hidden;
   background: var(--color-surface-subtle);
 }
@@ -298,17 +304,42 @@
   background: rgba(255, 255, 255, 1);
 }
 
+/* Property-type chip, overlaid on the image (bottom-left) */
+.cardTypeChip {
+  position: absolute;
+  bottom: var(--space-3);
+  left: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px var(--space-2) 4px 8px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(4px);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.cardTypeChip svg {
+  color: var(--color-brand);
+}
+
+/* Card spacing system — tight pairs, one clear break:
+   image →(12)→ name →(4)→ location →(12)→ status/doc area →(12)→ checked */
 .cardBody {
-  padding: var(--space-4) var(--space-5) var(--space-5);
+  padding: var(--space-3) var(--space-4) var(--space-4);
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
 }
 
 .cardName {
-  font-size: var(--text-body);
+  font-size: var(--text-body-lg);
   font-weight: var(--weight-semibold);
   color: var(--color-text-primary);
+  line-height: var(--leading-snug);
+  margin-bottom: var(--space-1);
 }
 
 .cardLocation {
@@ -319,55 +350,132 @@
   color: var(--color-text-muted);
 }
 
-.cardFooter {
+.cardStatusArea {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: var(--space-1);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
 }
 
-.cardStatusRow {
+.cardStatusPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.cardStatusDot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.pillGood  { background: var(--color-success-bg); color: var(--color-success-text); }
+.pillRed   { background: var(--color-danger-bg);  color: var(--color-danger); }
+.pillAmber { background: var(--color-warning-bg); color: var(--color-warning-text); }
+.pillGray  { background: var(--color-surface-subtle); color: var(--color-text-secondary); }
+
+/* Document status — plain row when everything is fine */
+.cardDocRow {
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  width: 100%;
+  font-size: var(--text-body-sm);
+  color: var(--color-text-secondary);
 }
 
-.statusDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+.cardDocRow svg {
+  color: var(--color-text-muted);
   flex-shrink: 0;
 }
 
-.statusDotGreen  { background: var(--color-success); }
-.statusDotRed    { background: var(--color-danger); }
-.statusDotAmber  { background: var(--color-warning); }
-.statusDotGray   { background: var(--color-text-muted); }
+.cardDocRowText {
+  flex: 1;
+  min-width: 0;
+}
 
-.cardStatusLabel {
+.cardDocChevron {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.card:hover .cardDocChevron {
+  transform: translateX(2px);
+  color: var(--color-text-secondary);
+}
+
+/* Document status — tinted callout when a document needs action */
+.cardDocCallout {
+  display: flex;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+}
+
+.calloutDanger  { background: var(--color-danger-bg); }
+.calloutWarning { background: var(--color-warning-bg); }
+
+.cardDocIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.calloutDanger .cardDocIcon  { color: var(--color-danger); }
+.calloutWarning .cardDocIcon { color: var(--color-warning); }
+
+.cardDocText {
+  min-width: 0;
+}
+
+.cardDocTitle {
   font-size: var(--text-body-sm);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+}
+
+.calloutDanger .cardDocTitle  { color: var(--color-danger); }
+.calloutWarning .cardDocTitle { color: var(--color-warning-text); }
+
+.cardDocAction {
+  margin-top: 2px;
+  font-size: var(--text-caption);
   font-weight: var(--weight-medium);
 }
 
-.statusGreen  { color: var(--color-success-text); }
-.statusRed    { color: var(--color-danger-text); }
-.statusAmber  { color: var(--color-warning-text); }
-.statusGray   { color: var(--color-text-muted); }
+.calloutDanger .cardDocAction  { color: var(--color-danger-text); }
+.calloutWarning .cardDocAction { color: var(--color-warning-text); }
 
 .cardChecked {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  margin-top: var(--space-3);
   font-size: var(--text-caption);
   color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
 }
 
-.cardChevron {
-  color: var(--color-text-muted);
-  transition: transform var(--transition-fast);
+.cardChecked svg {
   flex-shrink: 0;
 }
 
-.card:hover .cardChevron {
-  transform: translateX(2px);
-  color: var(--color-text-secondary);
+.cardCheckedText {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ── Add Property CTA ──────────────────────────── */
@@ -379,12 +487,12 @@
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  min-height: 220px;
+  min-height: 180px;
 }
 
 .addCtaLeft {
   flex: 1;
-  padding: var(--space-10) var(--space-8);
+  padding: var(--space-8);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -392,7 +500,7 @@
 }
 
 .addCtaLabel {
-  font-size: 0.6875rem;
+  font-size: var(--text-caption);
   font-weight: var(--weight-semibold);
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -468,21 +576,25 @@
 
   .greetingHint {
     text-align: left;
+    white-space: normal;
+  }
+
+  .greetingAddBtn {
+    width: 100%;
   }
 
   .attention {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--space-4);
+    flex-wrap: wrap;
   }
 
-  .attentionAction {
-    width: 100%;
+  .attentionBody {
+    flex-basis: calc(100% - 30px - var(--space-3));
   }
 
-  .reviewBtn {
-    width: 100%;
+  .attentionReviewBtn {
+    flex: 1;
     justify-content: center;
+    margin-left: calc(30px + var(--space-3));
   }
 
   .cardGrid {

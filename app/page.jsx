@@ -1,8 +1,21 @@
 'use client';
+import { useState } from 'react';
 import s from './dashboard.module.css';
 import Header from '@/components/vault/Header';
 import Button from '@/components/vault/Button';
-import { IconPlus, IconChevronRight, IconMapPin, IconHome } from '@/components/vault/Icons';
+import {
+  IconPlus,
+  IconChevronRight,
+  IconMapPin,
+  IconHome,
+  IconBuilding,
+  IconLeaf,
+  IconLandPlot,
+  IconCalendar,
+  IconExclamation,
+  IconFileText,
+  IconX,
+} from '@/components/vault/Icons';
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -14,46 +27,68 @@ function getGreeting() {
 const PROPERTIES = [
   {
     id: 1,
-    name: 'Green Meadows Apartment',
+    name: 'Green Meadows',
+    type: 'Apartment',
     location: 'Hyderabad, Telangana',
     status: 'all-good',
     statusLabel: 'All good',
     checked: 'Checked today',
+    docs: { ok: true },
     image: '/properties/apartment.jpg',
     gradient: 'linear-gradient(135deg, #6B8F6B 0%, #8FAF7F 40%, #A5C99E 100%)',
   },
   {
     id: 2,
     name: 'Family Land',
+    type: 'Agricultural Land',
     location: 'Warangal, Telangana',
     status: 'needs-attention',
     statusLabel: 'Needs attention',
     checked: 'Checked 2 days ago',
+    docs: {
+      tone: 'danger',
+      title: 'Property tax receipt needs an update',
+      action: 'Upload the latest receipt',
+    },
     image: '/properties/family-land.jpg',
     gradient: 'linear-gradient(135deg, #7BA17B 0%, #9DBF8F 40%, #C5DEB0 100%)',
   },
   {
     id: 3,
     name: 'Lakeview Plot',
+    type: 'Residential Plot',
     location: 'Bengaluru, Karnataka',
     status: 'check-needed',
     statusLabel: 'Check needed',
     checked: 'Last checked 8 months ago',
+    docs: {
+      tone: 'warning',
+      title: 'Encumbrance certificate is outdated',
+      action: 'Upload the latest document',
+    },
     image: '/properties/plot.jpg',
     gradient: 'linear-gradient(135deg, #6A9FB5 0%, #89B5C7 40%, #B0D4E0 100%)',
   },
 ];
 
-const STATUS_STYLES = {
-  'all-good':        { dot: 'statusDotGreen', label: 'statusGreen' },
-  'needs-attention':  { dot: 'statusDotRed',   label: 'statusRed' },
-  'check-needed':     { dot: 'statusDotAmber', label: 'statusAmber' },
-  'missing-info':     { dot: 'statusDotGray',  label: 'statusGray' },
-  'couldnt-check':    { dot: 'statusDotGray',  label: 'statusGray' },
+const STATUS_PILL = {
+  'all-good':        'pillGood',
+  'needs-attention': 'pillRed',
+  'check-needed':    'pillAmber',
+  'missing-info':    'pillGray',
+  'couldnt-check':   'pillGray',
+};
+
+const TYPE_ICON = {
+  'Apartment': IconBuilding,
+  'Agricultural Land': IconLeaf,
+  'Residential Plot': IconLandPlot,
 };
 
 export default function DashboardPage() {
   const greeting = getGreeting();
+  const [attentionDismissed, setAttentionDismissed] = useState(false);
+  const attentionCount = PROPERTIES.filter((p) => p.status === 'needs-attention').length;
 
   return (
     <div className={s.page}>
@@ -71,7 +106,7 @@ export default function DashboardPage() {
             </p>
           </div>
           <div className={s.greetingRight}>
-            <Button icon={IconPlus}>Add property</Button>
+            <Button icon={IconPlus} size="sm" className={s.greetingAddBtn}>Add property</Button>
             <span className={s.greetingHint}>
               Add a property and let Vault keep an eye on it.
             </span>
@@ -79,25 +114,32 @@ export default function DashboardPage() {
         </section>
 
         {/* ── Attention Banner ──────────────────── */}
-        <div className={s.attention}>
-          <div className={s.attentionImage}>
-            <img src="/properties/family-land.jpg" alt="Family Land" />
-          </div>
-          <div className={s.attentionBody}>
-            <div className={s.attentionLabel}>Needs your attention</div>
-            <div className={s.attentionTitle}>Family Land</div>
-            <div className={s.attentionLocation}>Warangal, Telangana</div>
-            <div className={s.attentionDesc}>
-              We found a new property record in government data.
+        {attentionCount > 0 && !attentionDismissed && (
+          <div className={s.attention} role="status">
+            <div className={s.attentionIcon}>
+              <IconExclamation size={20} />
             </div>
-          </div>
-          <div className={s.attentionAction}>
-            <button className={s.reviewBtn}>
+            <div className={s.attentionBody}>
+              <div className={s.attentionTitle}>
+                {attentionCount} {attentionCount === 1 ? 'property needs' : 'properties need'} your attention
+              </div>
+              <div className={s.attentionDesc}>
+                We found a new property record in government data.
+              </div>
+            </div>
+            <button className={s.attentionReviewBtn}>
               Review now
-              <span className={s.reviewArrow}>&rarr;</span>
+              <span aria-hidden="true">&rarr;</span>
+            </button>
+            <button
+              className={s.attentionDismiss}
+              aria-label="Dismiss notification"
+              onClick={() => setAttentionDismissed(true)}
+            >
+              <IconX size={16} />
             </button>
           </div>
-        </div>
+        )}
 
         {/* ── Property Grid ─────────────────────── */}
         <section>
@@ -107,10 +149,10 @@ export default function DashboardPage() {
               <span className={s.propertyCount}>{PROPERTIES.length}</span>
             </div>
             <div className={s.sortControl}>
-              <span>Sort by</span>
-              <select className={s.sortSelect} defaultValue="last-updated" aria-label="Sort properties">
-                <option value="last-updated">Last updated</option>
-                <option value="name">Name</option>
+              <span className={s.sortLabel}>Sort by</span>
+              <select className={s.sortSelect} defaultValue="last-activity" aria-label="Sort properties">
+                <option value="last-activity">Last activity</option>
+                <option value="name">Property name</option>
                 <option value="status">Status</option>
               </select>
             </div>
@@ -118,7 +160,8 @@ export default function DashboardPage() {
 
           <div className={s.cardGrid}>
             {PROPERTIES.map((prop) => {
-              const st = STATUS_STYLES[prop.status];
+              const pillClass = STATUS_PILL[prop.status];
+              const TypeIcon = TYPE_ICON[prop.type] || IconHome;
               return (
                 <a key={prop.id} href={`/property/${prop.id}`} className={s.card}>
                   <div className={s.cardImageWrap}>
@@ -137,6 +180,12 @@ export default function DashboardPage() {
                         onError={(e) => { e.currentTarget.style.display = 'none'; }}
                       />
                     )}
+                    {prop.type && (
+                      <span className={s.cardTypeChip}>
+                        <TypeIcon size={13} />
+                        {prop.type}
+                      </span>
+                    )}
                     <button
                       className={s.cardMenu}
                       aria-label={`More options for ${prop.name}`}
@@ -151,17 +200,43 @@ export default function DashboardPage() {
                       <IconMapPin size={14} />
                       {prop.location}
                     </div>
-                    <div className={s.cardFooter}>
-                      <div>
-                        <div className={s.cardStatusRow}>
-                          <span className={`${s.statusDot} ${s[st.dot]}`} />
-                          <span className={`${s.cardStatusLabel} ${s[st.label]}`}>{prop.statusLabel}</span>
+
+                    <div className={s.cardStatusArea}>
+                      {prop.docs?.ok ? (
+                        <>
+                          <span className={`${s.cardStatusPill} ${s[pillClass]}`}>
+                            <span className={s.cardStatusDot} />
+                            {prop.statusLabel}
+                          </span>
+                          <div className={s.cardDocRow}>
+                            <IconFileText size={15} />
+                            <span className={s.cardDocRowText}>All documents up to date</span>
+                            <IconChevronRight size={16} className={s.cardDocChevron} />
+                          </div>
+                        </>
+                      ) : (
+                        <div
+                          className={`${s.cardDocCallout} ${
+                            prop.docs.tone === 'danger' ? s.calloutDanger : s.calloutWarning
+                          }`}
+                        >
+                          <span className={s.cardDocIcon}>
+                            <IconFileText size={16} />
+                          </span>
+                          <div className={s.cardDocText}>
+                            <div className={s.cardDocTitle}>{prop.docs.title}</div>
+                            <div className={s.cardDocAction}>
+                              {prop.docs.action}
+                              <span aria-hidden="true"> &rarr;</span>
+                            </div>
+                          </div>
                         </div>
-                        <div className={s.cardChecked}>{prop.checked}</div>
-                      </div>
-                      <span className={s.cardChevron}>
-                        <IconChevronRight size={18} />
-                      </span>
+                      )}
+                    </div>
+
+                    <div className={s.cardChecked}>
+                      <IconCalendar size={13} />
+                      <span className={s.cardCheckedText}>{prop.checked}</span>
                     </div>
                   </div>
                 </a>
