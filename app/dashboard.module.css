@@ -1,0 +1,503 @@
+.page {
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.main {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: var(--space-10) var(--content-padding) var(--space-20);
+}
+
+/* ── Greeting ──────────────────────────────────── */
+
+.greeting {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-10);
+  gap: var(--space-6);
+}
+
+.greetingLeft {
+  flex: 1;
+}
+
+.greetingTitle {
+  font-size: 2rem;
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+  line-height: var(--leading-tight);
+  margin-bottom: var(--space-2);
+}
+
+.greetingSub {
+  font-size: var(--text-body-lg);
+  color: var(--color-text-secondary);
+}
+
+.greetingRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.greetingHint {
+  font-size: var(--text-caption);
+  color: var(--color-text-muted);
+  text-align: right;
+  max-width: 240px;
+}
+
+/* ── Attention Banner ──────────────────────────── */
+
+.attention {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-5) var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-10);
+  transition: box-shadow var(--transition-fast);
+}
+
+.attention:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.attentionImage {
+  width: 88px;
+  height: 88px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--color-surface-subtle);
+}
+
+.attentionImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.attentionImagePlaceholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #8BC34A33 0%, #4CAF5033 50%, #2E7D3233 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-brand);
+}
+
+.attentionBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.attentionLabel {
+  font-size: 0.6875rem;
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-danger-text);
+  margin-bottom: var(--space-1);
+}
+
+.attentionTitle {
+  font-size: var(--text-h3);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: 2px;
+}
+
+.attentionLocation {
+  font-size: var(--text-body-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-1);
+}
+
+.attentionDesc {
+  font-size: var(--text-body-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-normal);
+}
+
+.attentionAction {
+  flex-shrink: 0;
+}
+
+.reviewBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  background: var(--color-danger);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  white-space: nowrap;
+}
+
+.reviewBtn:hover {
+  background: #b12b2b;
+}
+
+.reviewArrow {
+  transition: transform var(--transition-fast);
+}
+
+.reviewBtn:hover .reviewArrow {
+  transform: translateX(2px);
+}
+
+/* ── Properties Section ────────────────────────── */
+
+.propertiesHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
+  gap: var(--space-4);
+}
+
+.propertiesTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.propertiesTitleText {
+  font-size: var(--text-h2);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.propertyCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 var(--space-2);
+  background: var(--color-surface-subtle);
+  color: var(--color-text-secondary);
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+  border-radius: var(--radius-full);
+}
+
+.sortControl {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-body-sm);
+  color: var(--color-text-muted);
+}
+
+.sortSelect {
+  appearance: none;
+  background: none;
+  border: none;
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding-right: var(--space-4);
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23868B88' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right center;
+}
+
+/* ── Property Card (Vertical / Dashboard) ──────── */
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-5);
+  margin-bottom: var(--space-12);
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  text-decoration: none;
+  color: inherit;
+}
+
+.card:hover {
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-md);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+.cardImageWrap {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--color-surface-subtle);
+}
+
+.cardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardImagePlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+}
+
+.cardMenu {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  font-size: 18px;
+  line-height: 1;
+  transition: background var(--transition-fast);
+  letter-spacing: 1px;
+}
+
+.cardMenu:hover {
+  background: rgba(255, 255, 255, 1);
+}
+
+.cardBody {
+  padding: var(--space-4) var(--space-5) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cardName {
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.cardLocation {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--text-body-sm);
+  color: var(--color-text-muted);
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-1);
+}
+
+.cardStatusRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.statusDotGreen  { background: var(--color-success); }
+.statusDotRed    { background: var(--color-danger); }
+.statusDotAmber  { background: var(--color-warning); }
+.statusDotGray   { background: var(--color-text-muted); }
+
+.cardStatusLabel {
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+}
+
+.statusGreen  { color: var(--color-success-text); }
+.statusRed    { color: var(--color-danger-text); }
+.statusAmber  { color: var(--color-warning-text); }
+.statusGray   { color: var(--color-text-muted); }
+
+.cardChecked {
+  font-size: var(--text-caption);
+  color: var(--color-text-muted);
+}
+
+.cardChevron {
+  color: var(--color-text-muted);
+  transition: transform var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.card:hover .cardChevron {
+  transform: translateX(2px);
+  color: var(--color-text-secondary);
+}
+
+/* ── Add Property CTA ──────────────────────────── */
+
+.addCta {
+  display: flex;
+  align-items: stretch;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  min-height: 220px;
+}
+
+.addCtaLeft {
+  flex: 1;
+  padding: var(--space-10) var(--space-8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.addCtaLabel {
+  font-size: 0.6875rem;
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-brand-text);
+}
+
+.addCtaTitle {
+  font-size: var(--text-h2);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.addCtaDesc {
+  font-size: var(--text-body);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  max-width: 400px;
+}
+
+.addCtaRight {
+  width: 380px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.addCtaImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.addCtaImagePlaceholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #e8f5ee 0%, #c8e6d0 40%, #a8d8b8 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+}
+
+.handwrittenText {
+  font-size: 1.75rem;
+  font-style: italic;
+  color: var(--color-brand);
+  opacity: 0.5;
+  line-height: 1.4;
+  text-align: center;
+  transform: rotate(-3deg);
+}
+
+/* ── Responsive ────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .cardGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .addCtaRight {
+    width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .greeting {
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .greetingRight {
+    align-items: flex-start;
+  }
+
+  .greetingHint {
+    text-align: left;
+  }
+
+  .attention {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--space-4);
+  }
+
+  .attentionAction {
+    width: 100%;
+  }
+
+  .reviewBtn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .cardGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .addCta {
+    flex-direction: column;
+  }
+
+  .addCtaRight {
+    width: 100%;
+    height: 180px;
+  }
+
+  .propertiesHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

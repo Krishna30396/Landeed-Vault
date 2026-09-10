@@ -1,470 +1,187 @@
 'use client';
+import s from './dashboard.module.css';
+import Header from '@/components/vault/Header';
+import Button from '@/components/vault/Button';
+import { IconPlus, IconChevronRight, IconMapPin, IconHome } from '@/components/vault/Icons';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import dynamic from 'next/dynamic';
-import { pointAtFraction, cumulative, haversine } from '@/lib/geo';
-import { CATEGORY_IDS } from '@/lib/categories';
-import LocationInput from '@/components/LocationInput';
-import Ribbon from '@/components/Ribbon';
-import RadiusControl from '@/components/RadiusControl';
-import CategoryChips from '@/components/CategoryChips';
-import ResultsList from '@/components/ResultsList';
-import styles from './page.module.css';
-
-const MapView = dynamic(() => import('@/components/MapView'), {
-  ssr: false,
-  loading: () => <div className={styles.mapLoading}>Loading map…</div>,
-});
-
-const DEFAULT_CATS = ['restaurant', 'cafe'];
-const shortName = (s) => (s || '').split(',')[0].trim();
-
-function parsePoint(s) {
-  const [lat, lng] = (s || '').split(',').map(Number);
-  return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return { text: 'Good morning', emoji: '\u{1F324}️' };
+  if (h < 17) return { text: 'Good afternoon', emoji: '☀️' };
+  return { text: 'Good evening', emoji: '\u{1F319}' };
 }
 
-export default function Home() {
-  const [a, setA] = useState(null);
-  const [b, setB] = useState(null);
+const PROPERTIES = [
+  {
+    id: 1,
+    name: 'Green Meadows Apartment',
+    location: 'Hyderabad, Telangana',
+    status: 'all-good',
+    statusLabel: 'All good',
+    checked: 'Checked today',
+    gradient: 'linear-gradient(135deg, #6B8F6B 0%, #8FAF7F 40%, #A5C99E 100%)',
+  },
+  {
+    id: 2,
+    name: 'Family Land',
+    location: 'Warangal, Telangana',
+    status: 'needs-attention',
+    statusLabel: 'Needs attention',
+    checked: 'Checked 2 days ago',
+    gradient: 'linear-gradient(135deg, #7BA17B 0%, #9DBF8F 40%, #C5DEB0 100%)',
+  },
+  {
+    id: 3,
+    name: 'Lakeview Plot',
+    location: 'Bengaluru, Karnataka',
+    status: 'check-needed',
+    statusLabel: 'Check needed',
+    checked: 'Last checked 8 months ago',
+    gradient: 'linear-gradient(135deg, #6A9FB5 0%, #89B5C7 40%, #B0D4E0 100%)',
+  },
+];
 
-  const [routes, setRoutes] = useState(null);
-  const [routeIndex, setRouteIndex] = useState(0);
-  const [routeLoading, setRouteLoading] = useState(false);
-  const [routeError, setRouteError] = useState(null);
+const STATUS_STYLES = {
+  'all-good':        { dot: 'statusDotGreen', label: 'statusGreen' },
+  'needs-attention':  { dot: 'statusDotRed',   label: 'statusRed' },
+  'check-needed':     { dot: 'statusDotAmber', label: 'statusAmber' },
+  'missing-info':     { dot: 'statusDotGray',  label: 'statusGray' },
+  'couldnt-check':    { dot: 'statusDotGray',  label: 'statusGray' },
+};
 
-  const [hubs, setHubs] = useState(null);
-  const [hubId, setHubId] = useState(null);
-  const [hubsLoading, setHubsLoading] = useState(false);
-  const [hubsNote, setHubsNote] = useState(null);
-  const [hubsError, setHubsError] = useState(null);
-
-  const [radius, setRadius] = useState(5);
-  const [cats, setCats] = useState(DEFAULT_CATS);
-
-  const [placesData, setPlacesData] = useState(null);
-  const [placesLoading, setPlacesLoading] = useState(false);
-  const [placesError, setPlacesError] = useState(null);
-
-  const [activePlaceId, setActivePlaceId] = useState(null);
-  const [openPlaceId, setOpenPlaceId] = useState(null);
-  const [panTarget, setPanTarget] = useState(null);
-  const [mapCenter, setMapCenter] = useState(null);
-  const [toast, setToast] = useState(null);
-
-  // URL writing must not start until the read effect's state has COMMITTED —
-  // a ref flips too early (same commit) and clobbers a shared link's params.
-  const [restored, setRestored] = useState(false);
-  const urlIntent = useRef({}); // r / hub read from a shared URL, honoured once
-
-  // ---- Read URL state on mount (§9) ---------------------------------------
-  useEffect(() => {
-    const p = new URLSearchParams(window.location.search);
-    const pa = parsePoint(p.get('a'));
-    const pb = parsePoint(p.get('b'));
-    if (pa) setA({ ...pa, name: p.get('an') || `${pa.lat}, ${pa.lng}` });
-    if (pb) setB({ ...pb, name: p.get('bn') || `${pb.lat}, ${pb.lng}` });
-
-    urlIntent.current = {
-      r: p.get('r') != null ? parseInt(p.get('r'), 10) : null,
-      hub: p.get('hub'),
-    };
-
-    const rad = parseInt(p.get('rad'), 10);
-    if (rad >= 1 && rad <= 25) setRadius(rad);
-
-    const cat = (p.get('cat') || '').split(',').filter((id) => CATEGORY_IDS.has(id));
-    if (cat.length) setCats(cat);
-
-    setRestored(true);
-
-    // No shared link and no saved search: centre the map near the user so
-    // browsing cafés works before any location is typed. Best-effort only.
-    if (!pa && !pb && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) =>
-          setPanTarget({
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-            zoom: 13,
-          }),
-        () => {},
-        { maximumAge: 600000, timeout: 8000 }
-      );
-    }
-  }, []);
-
-  // ---- Route when both ends are set ---------------------------------------
-  useEffect(() => {
-    if (!a || !b) {
-      // A location was deleted: the route, hub and mute all reset — the map
-      // gets its colours back.
-      setRoutes(null);
-      setRouteError(null);
-      setHubs(null);
-      setHubId(null);
-      return;
-    }
-    if (a.lat === b.lat && a.lng === b.lng) {
-      setRouteError('Those are the same place — pick two different locations.');
-      setRoutes(null);
-      setHubs(null);
-      setHubId(null);
-      setPlacesData(null);
-      return;
-    }
-
-    const controller = new AbortController();
-    setRouteLoading(true);
-    setRouteError(null);
-    setHubs(null);
-    setHubId(null);
-    setPlacesData(null);
-
-    fetch(`/api/route?from=${a.lat},${a.lng}&to=${b.lat},${b.lng}`, { signal: controller.signal })
-      .then(async (res) => {
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Routing failed');
-        setRoutes(data.routes);
-        const wanted = urlIntent.current.r;
-        setRouteIndex(wanted != null && wanted >= 0 && wanted < data.routes.length ? wanted : 0);
-        urlIntent.current.r = null;
-      })
-      .catch((err) => {
-        if (err.name !== 'AbortError') setRouteError(err.message);
-      })
-      .finally(() => setRouteLoading(false));
-
-    return () => controller.abort();
-  }, [a, b]);
-
-  // ---- Midpoint: walk the drawn geometry, never average coordinates -------
-  const selectedRoute = routes?.[routeIndex] || null;
-  const midInfo = useMemo(
-    () => (selectedRoute ? pointAtFraction(selectedRoute.coords, 0.5) : null),
-    [selectedRoute]
-  );
-  const midpoint = midInfo?.point || null;
-
-  // ---- Hubs when the midpoint moves ---------------------------------------
-  useEffect(() => {
-    if (!midpoint) return;
-    const controller = new AbortController();
-    setHubsLoading(true);
-    setHubsNote(null);
-    setHubsError(null);
-
-    fetch(`/api/hubs?lat=${midpoint[0]}&lng=${midpoint[1]}&maxKm=15`, { signal: controller.signal })
-      .then(async (res) => {
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Hub search failed');
-        setHubs(data.hubs);
-        const wanted = urlIntent.current.hub;
-        urlIntent.current.hub = null;
-        if (wanted === 'raw') {
-          setHubId('raw');
-        } else if (wanted && data.hubs.some((h) => h.id === wanted)) {
-          setHubId(wanted);
-        } else if (data.hubs.length) {
-          setHubId(data.hubs[0].id);
-          if (data.searchedKm > 15) {
-            setHubsNote(`Nearest towns are ${Math.round(data.searchedKm)} km out — widened the search.`);
-          }
-        } else {
-          setHubId('raw');
-          setHubsNote('No towns near the midpoint — using the exact halfway point.');
-        }
-      })
-      .catch((err) => {
-        if (err.name !== 'AbortError') {
-          // A failed lookup must not look like an empty one (§12).
-          setHubs([]);
-          setHubId('raw');
-          setHubsError("Couldn't look up nearby towns. Meeting at the exact halfway point instead.");
-        }
-      })
-      .finally(() => setHubsLoading(false));
-
-    return () => controller.abort();
-  }, [midpoint?.[0], midpoint?.[1]]);
-
-  const hub = useMemo(() => {
-    if (!midpoint) return null;
-    if (hubId && hubId !== 'raw') {
-      const h = hubs?.find((x) => x.id === hubId);
-      if (h) return h;
-    }
-    return { id: 'raw', name: 'Exact midpoint', lat: midpoint[0], lng: midpoint[1] };
-  }, [hubId, hubs, midpoint]);
-
-  // ---- Ribbon distances: measured along the drawn geometry ----------------
-  const split = useMemo(() => {
-    if (!selectedRoute || !midInfo) return null;
-    if (!hub || hub.id === 'raw') {
-      return { distA: midInfo.walked, distB: midInfo.total - midInfo.walked };
-    }
-    // Project the chosen hub onto the route: nearest vertex's cumulative distance.
-    const coords = selectedRoute.coords;
-    const { steps, total } = cumulative(coords);
-    let best = 0;
-    let bestD = Infinity;
-    for (let i = 0; i < coords.length; i++) {
-      const d = haversine([hub.lat, hub.lng], coords[i]);
-      if (d < bestD) {
-        bestD = d;
-        best = i;
-      }
-    }
-    // bestD is the hub's detour off the route itself — shown honestly too.
-    return { distA: steps[best], distB: total - steps[best], offRouteKm: bestD };
-  }, [selectedRoute, midInfo, hub]);
-
-  // ---- Where to search for places -----------------------------------------
-  // With a route: the snapped hub (once snapping settles — querying the raw
-  // midpoint first would double every Overpass search). Without a route:
-  // wherever the map is looking, so browsing cafés works with no locations set.
-  const searchCenter = useMemo(() => {
-    if (routes) {
-      return hub && hubId && !hubsLoading ? { lat: hub.lat, lng: hub.lng, isHub: true } : null;
-    }
-    return mapCenter ? { ...mapCenter, isHub: false } : null;
-  }, [routes, hub, hubId, hubsLoading, mapCenter]);
-
-  // ---- Places when search centre / radius / categories change --------------
-  useEffect(() => {
-    if (!searchCenter) return;
-    if (!cats.length) {
-      setPlacesData([]);
-      setPlacesError(null);
-      return;
-    }
-    const controller = new AbortController();
-    setPlacesLoading(true);
-    setPlacesError(null);
-
-    fetch(
-      `/api/places?lat=${searchCenter.lat}&lng=${searchCenter.lng}&radiusKm=${radius}&categories=${cats.join(',')}`,
-      { signal: controller.signal }
-    )
-      .then(async (res) => {
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Places search failed');
-        setPlacesData(data.places);
-      })
-      .catch((err) => {
-        if (err.name !== 'AbortError') {
-          setPlacesData(null);
-          setPlacesError(err.message);
-        }
-      })
-      .finally(() => setPlacesLoading(false));
-
-    return () => controller.abort();
-  }, [searchCenter?.lat, searchCenter?.lng, radius, cats]);
-
-  // ---- Write URL on every change (§9) — replaceState, no history spam -----
-  useEffect(() => {
-    if (!restored) return;
-    const p = new URLSearchParams();
-    if (a) {
-      p.set('a', `${a.lat.toFixed(4)},${a.lng.toFixed(4)}`);
-      p.set('an', a.name);
-    }
-    if (b) {
-      p.set('b', `${b.lat.toFixed(4)},${b.lng.toFixed(4)}`);
-      p.set('bn', b.name);
-    }
-    // While a shared link's r/hub are still pending (fetches in flight),
-    // keep writing the incoming values so the URL never loses them.
-    if (routes && routeIndex > 0) p.set('r', String(routeIndex));
-    else if (urlIntent.current.r) p.set('r', String(urlIntent.current.r));
-    if (hubId) p.set('hub', hubId);
-    else if (urlIntent.current.hub) p.set('hub', urlIntent.current.hub);
-    p.set('rad', String(radius));
-    if (cats.length) p.set('cat', cats.join(','));
-    const qs = p.toString();
-    window.history.replaceState(null, '', qs ? `/?${qs}` : '/');
-  }, [restored, a, b, routes, routeIndex, hubId, radius, cats]);
-
-  // ---- Actions ------------------------------------------------------------
-  const toggleCat = useCallback(
-    (id) => setCats((cur) => (cur.includes(id) ? cur.filter((c) => c !== id) : [...cur, id])),
-    []
-  );
-
-  const share = useCallback(async () => {
-    const url = window.location.href;
-    // On phones the native share sheet goes straight to the messaging app —
-    // that's the whole loop. Clipboard is the desktop path.
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: 'Halfway', url });
-        return;
-      } catch (err) {
-        if (err.name === 'AbortError') return; // user closed the sheet
-      }
-    }
-    try {
-      await navigator.clipboard.writeText(url);
-      setToast('Link copied');
-    } catch {
-      window.prompt('Copy this link', url);
-      return;
-    }
-    setTimeout(() => setToast(null), 2500);
-  }, []);
-
-  const selectPlace = useCallback(
-    (id) => {
-      setActivePlaceId(id);
-      setOpenPlaceId(id);
-      const p = placesData?.find((x) => x.id === id);
-      if (p) setPanTarget({ lat: p.lat, lng: p.lng });
-    },
-    [placesData]
-  );
-
-  const openPlace = openPlaceId ? placesData?.find((x) => x.id === openPlaceId) || null : null;
-
-  const hasSearch = a && b;
+export default function DashboardPage() {
+  const greeting = getGreeting();
 
   return (
-    <div className={styles.app}>
-      <aside className={styles.panel}>
-        <header className={styles.header}>
-          <h1 className={styles.logo}>HALFWAY</h1>
-          {hasSearch && routes && (
-            <button type="button" className={styles.share} onClick={share}>
-              Share
-            </button>
-          )}
-        </header>
+    <div className={s.page}>
+      <Header showSearch hasNotifications userInitials="K" />
 
-        <div className={styles.inputs}>
-          <LocationInput label="You" marker="a" value={a} onSelect={setA} bias={b} />
-          <LocationInput label="Them" marker="b" value={b} onSelect={setB} bias={a} />
-        </div>
-
-        {!hasSearch && (
-          <p className={styles.empty}>Two locations in. One fair meeting point out.</p>
-        )}
-
-        {routeLoading && <p className={styles.status}>Finding the route…</p>}
-        {routeError && <p className={styles.statusError}>{routeError}</p>}
-
-        {split && hub && a && b && (
-          <Ribbon
-            aName={shortName(a.name)}
-            bName={shortName(b.name)}
-            distA={split.distA}
-            distB={split.distB}
-            offRouteKm={split.offRouteKm || 0}
-          />
-        )}
-
-        {routes && routes.length > 1 && (
-          <div className={styles.altRow}>
-            <span className={styles.sectionLabel}>Route</span>
-            {routes.map((r, i) => (
-              <button
-                key={i}
-                type="button"
-                className={i === routeIndex ? styles.altChipOn : styles.altChip}
-                onClick={() => setRouteIndex(i)}
-              >
-                {Math.round(r.durationMin)}&thinsp;min
-              </button>
-            ))}
+      <main className={s.main}>
+        {/* ── Greeting ──────────────────────────── */}
+        <section className={s.greeting}>
+          <div className={s.greetingLeft}>
+            <h1 className={s.greetingTitle}>
+              {greeting.text}, Krishna {greeting.emoji}
+            </h1>
+            <p className={s.greetingSub}>
+              Here's the latest on your properties.
+            </p>
           </div>
-        )}
+          <div className={s.greetingRight}>
+            <Button icon={IconPlus}>Add property</Button>
+            <span className={s.greetingHint}>
+              Add a property and let Vault keep an eye on it.
+            </span>
+          </div>
+        </section>
 
-        {midpoint && (
-          <section className={styles.hubSection}>
-            <span className={styles.sectionLabel}>Meet in</span>
-            {hub && hubId && (
-              <h2 className={styles.hubName}>
-                {hub.id === 'raw' ? 'The exact midpoint' : hub.name}
-              </h2>
-            )}
-            {hubsLoading && <p className={styles.status}>Finding towns…</p>}
-            {hubs != null && (
-              <div className={styles.hubChips}>
-                {hubs.map((h) => (
-                  <button
-                    key={h.id}
-                    type="button"
-                    className={h.id === hubId ? styles.hubChipOn : styles.hubChip}
-                    onClick={() => setHubId(h.id)}
-                  >
-                    {h.name}
-                  </button>
-                ))}
-                <button
-                  type="button"
-                  className={hubId === 'raw' ? styles.hubChipOn : styles.hubChip}
-                  onClick={() => setHubId('raw')}
-                >
-                  Exact midpoint
-                </button>
-              </div>
-            )}
-            {hubsNote && <p className={styles.note}>{hubsNote}</p>}
-            {hubsError && <p className={styles.statusError}>{hubsError}</p>}
-          </section>
-        )}
-
-        <div className={styles.controls}>
-          <RadiusControl value={radius} onChange={setRadius} />
-          <CategoryChips selected={cats} onToggle={toggleCat} />
+        {/* ── Attention Banner ──────────────────── */}
+        <div className={s.attention}>
+          <div className={s.attentionImage}>
+            <div className={s.attentionImagePlaceholder}>
+              <IconHome size={32} />
+            </div>
+          </div>
+          <div className={s.attentionBody}>
+            <div className={s.attentionLabel}>Needs your attention</div>
+            <div className={s.attentionTitle}>Family Land</div>
+            <div className={s.attentionLocation}>Warangal, Telangana</div>
+            <div className={s.attentionDesc}>
+              We found a new property record in government data.
+            </div>
+          </div>
+          <div className={s.attentionAction}>
+            <button className={s.reviewBtn}>
+              Review now
+              <span className={s.reviewArrow}>&rarr;</span>
+            </button>
+          </div>
         </div>
-        <div className={styles.results}>
-          {!searchCenter && routes ? (
-            <div className={styles.status}>Finding the meeting point…</div>
-          ) : (
-            <ResultsList
-              places={placesData}
-              hub={searchCenter}
-              loading={placesLoading}
-              error={placesError}
-              activePlaceId={activePlaceId}
-              onHover={setActivePlaceId}
-              onSelect={selectPlace}
-              onWidenRadius={() => setRadius((r) => Math.min(r + 5, 25))}
-              canWiden={radius < 25}
-            />
-          )}
-        </div>
-      </aside>
 
-      <div className={styles.map}>
-        <MapView
-          a={a}
-          b={b}
-          routes={routes}
-          routeIndex={routeIndex}
-          onSelectRoute={setRouteIndex}
-          midpoint={midpoint}
-          hub={hub}
-          radiusKm={radius}
-          places={placesData}
-          activePlaceId={activePlaceId}
-          onPlaceHover={setActivePlaceId}
-          onPlaceSelect={selectPlace}
-          openPlace={openPlace}
-          onPopupClose={() => setOpenPlaceId(null)}
-          panTarget={panTarget}
-          onCenterChange={setMapCenter}
-          hubCandidates={hubs}
-          onHubSelect={setHubId}
-          distanceNote={searchCenter?.isHub ? 'from the meeting point' : 'from the map centre'}
-        />
-      </div>
+        {/* ── Property Grid ─────────────────────── */}
+        <section>
+          <div className={s.propertiesHeader}>
+            <div className={s.propertiesTitle}>
+              <h2 className={s.propertiesTitleText}>Your properties</h2>
+              <span className={s.propertyCount}>{PROPERTIES.length}</span>
+            </div>
+            <div className={s.sortControl}>
+              <span>Sort by</span>
+              <select className={s.sortSelect} defaultValue="last-updated" aria-label="Sort properties">
+                <option value="last-updated">Last updated</option>
+                <option value="name">Name</option>
+                <option value="status">Status</option>
+              </select>
+            </div>
+          </div>
 
-      {toast && (
-        <div className={styles.toast} role="status">
-          {toast}
-        </div>
-      )}
+          <div className={s.cardGrid}>
+            {PROPERTIES.map((prop) => {
+              const st = STATUS_STYLES[prop.status];
+              return (
+                <article key={prop.id} className={s.card} tabIndex={0}>
+                  <div className={s.cardImageWrap}>
+                    <div
+                      className={s.cardImagePlaceholder}
+                      style={{ background: prop.gradient }}
+                    >
+                      <IconHome size={36} style={{ opacity: 0.25, color: '#fff' }} />
+                    </div>
+                    <button
+                      className={s.cardMenu}
+                      aria-label={`More options for ${prop.name}`}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      &middot;&middot;&middot;
+                    </button>
+                  </div>
+                  <div className={s.cardBody}>
+                    <div className={s.cardName}>{prop.name}</div>
+                    <div className={s.cardLocation}>
+                      <IconMapPin size={14} />
+                      {prop.location}
+                    </div>
+                    <div className={s.cardFooter}>
+                      <div>
+                        <div className={s.cardStatusRow}>
+                          <span className={`${s.statusDot} ${s[st.dot]}`} />
+                          <span className={`${s.cardStatusLabel} ${s[st.label]}`}>{prop.statusLabel}</span>
+                        </div>
+                        <div className={s.cardChecked}>{prop.checked}</div>
+                      </div>
+                      <span className={s.cardChevron}>
+                        <IconChevronRight size={18} />
+                      </span>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ── Add Property CTA ──────────────────── */}
+        <section className={s.addCta}>
+          <div className={s.addCtaLeft}>
+            <span className={s.addCtaLabel}>A safer tomorrow</span>
+            <h2 className={s.addCtaTitle}>Add another property</h2>
+            <p className={s.addCtaDesc}>
+              Keep all your properties in one place. We'll check for updates
+              and let you know if anything needs your attention.
+            </p>
+            <div>
+              <Button icon={IconPlus}>Add property</Button>
+            </div>
+          </div>
+          <div className={s.addCtaRight}>
+            <div className={s.addCtaImagePlaceholder}>
+              <span className={s.handwrittenText}>
+                Your properties,<br />looked after.
+              </span>
+            </div>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }
