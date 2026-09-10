@@ -1,7 +1,9 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import s from './property.module.css';
 import Header from '@/components/vault/Header';
+import Button from '@/components/vault/Button';
+import Modal from '@/components/vault/Modal';
 import {
   IconChevronRight,
   IconMapPin,
@@ -10,10 +12,16 @@ import {
   IconEdit,
   IconAlertTriangle,
   IconAlertCircle,
+  IconInfo,
   IconCheckCircle,
   IconShield,
   IconUpload,
+  IconUploadCloud,
+  IconSearch,
+  IconSparkle,
   IconPlus,
+  IconX,
+  IconMoreHorizontal,
 } from '@/components/vault/Icons';
 
 const PROPERTIES = {
@@ -26,6 +34,7 @@ const PROPERTIES = {
     propertyType: 'Apartment',
     status: 'all-good',
     tags: ['Owned', '1,200 sq ft', 'Unit 4B'],
+    image: '/properties/apartment.jpg',
     gradient: 'linear-gradient(135deg, #6B8F6B 0%, #8FAF7F 40%, #A5C99E 100%)',
   },
   2: {
@@ -37,11 +46,12 @@ const PROPERTIES = {
     propertyType: 'Agricultural land',
     status: 'needs-attention',
     tags: ['Owned', '2.4 acres', 'Survey No. 48/2'],
+    image: '/properties/family-land.jpg',
     gradient: 'linear-gradient(135deg, #5a8f3c 0%, #7ab356 30%, #95c76e 50%, #a8d580 70%, #6b9f4a 100%)',
     handwritten: 'Our family\nland for\ngenerations',
     alert: {
       title: 'We found a newer property record.',
-      desc: 'Your saved EC is from 2014. A newer record was registered in July 2025.',
+      desc: 'Your saved EC is from 2024. A new record was registered in July 2025.',
       action: 'Review what changed',
     },
   },
@@ -54,6 +64,7 @@ const PROPERTIES = {
     propertyType: 'Residential plot',
     status: 'check-needed',
     tags: ['Owned', '2,400 sq ft', 'Survey No. 56/1'],
+    image: '/properties/plot.jpg',
     gradient: 'linear-gradient(135deg, #6A9FB5 0%, #89B5C7 40%, #B0D4E0 100%)',
   },
 };
@@ -61,7 +72,24 @@ const PROPERTIES = {
 const DOCUMENTS = [
   { name: 'Sale deed', desc: 'Proof of ownership', date: 'Added on 12 Jan 2023', status: 'added' },
   { name: 'Encumbrance Certificate (EC)', desc: 'Shows if there are any loans or liabilities', date: 'Added on 29 Mar 2024', status: 'added' },
-  { name: 'Property tax receipt', desc: 'Latest property tax payment', date: 'Added on 10 Apr 2023', status: 'needs-update' },
+  {
+    name: 'Property tax receipt',
+    desc: 'Latest property tax payment',
+    date: 'Added on 10 Apr 2023',
+    status: 'needs-update',
+    update: {
+      heading: 'Property tax receipt needs an update',
+      subtext: 'A newer property tax record (2025) is available for this property.',
+      before: { kind: 'Property tax receipt', headline: '2023', meta: 'Saved in Vault' },
+      after: { kind: 'Property tax record', headline: '2025', meta: 'Available now' },
+      uploadTitle: 'Add the latest receipt',
+      uploadDesc: 'Upload the 2025 property tax receipt to keep your records up to date.',
+      help: {
+        title: 'Not sure where to get it?',
+        desc: 'Terra can look up the latest property tax record from government sources for you.',
+      },
+    },
+  },
   { name: 'Pattay / Pahani', desc: 'Land ownership record (Telangana)', date: 'Added on 6 Feb 2023', status: 'added' },
   { name: 'Other document', desc: 'Any other relevant document', date: 'No documents added', status: 'add' },
 ];
@@ -131,7 +159,7 @@ const ACTIVITY_FILTERS = [
   { key: 'property', label: 'Property changes' },
 ];
 
-const TAB_LIST = ['Overview', 'Documents', 'Government records', 'Activity'];
+const TAB_LIST = ['Documents', 'Overview', 'Government records', 'Activity'];
 
 const DOC_FILTERS = [
   { key: 'all', label: 'All', count: 5 },
@@ -262,7 +290,7 @@ function OverviewTab({ property }) {
 
 function DocumentsTab() {
   const [activeFilter, setActiveFilter] = useState('all');
-  const needsUpdate = DOCUMENTS.filter(d => d.status === 'needs-update');
+  const [updateDoc, setUpdateDoc] = useState(null);
   const filtered = activeFilter === 'all' ? DOCUMENTS :
     activeFilter === 'added' ? DOCUMENTS.filter(d => d.status === 'added') :
     activeFilter === 'needs-update' ? DOCUMENTS.filter(d => d.status === 'needs-update') :
@@ -270,37 +298,6 @@ function DocumentsTab() {
 
   return (
     <>
-      {/* ── Documents heading ──────────────── */}
-      <div className={s.docsHeading}>
-        <h2 className={s.docsTitle}>Documents</h2>
-        <p className={s.docsDesc}>
-          Keep all your property documents in one place. We'll let you know if
-          anything needs your attention.
-        </p>
-      </div>
-
-      {/* ── Document alert ─────────────────── */}
-      {needsUpdate.length > 0 && (
-        <div className={s.docAlert}>
-          <div className={s.docAlertIcon}>
-            <IconAlertCircle size={24} />
-          </div>
-          <div className={s.docAlertBody}>
-            <div className={s.docAlertTitle}>
-              {needsUpdate.length} document needs your attention
-            </div>
-            <div className={s.docAlertDesc}>
-              Your property tax receipt looks outdated. Please upload the latest one.
-            </div>
-          </div>
-          <div className={s.docAlertAction}>
-            <button className={s.alertBtn}>
-              Update now <span>&rarr;</span>
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* ── Filter chips ───────────────────── */}
       <div className={s.docFilters}>
         <div className={s.filterChips}>
@@ -323,8 +320,17 @@ function DocumentsTab() {
       {/* ── Document table ─────────────────── */}
       <div className={s.section}>
         <div className={s.docList}>
-          {filtered.map((doc) => (
-            <div key={doc.name} className={s.docRowFull}>
+          {filtered.map((doc) => {
+            const actionable = doc.status === 'needs-update' || doc.status === 'add';
+            return (
+            <div
+              key={doc.name}
+              className={`${s.docRowFull} ${actionable ? s.docRowActionable : ''}`}
+              onClick={actionable ? () => setUpdateDoc(doc) : undefined}
+              role={actionable ? 'button' : undefined}
+              tabIndex={actionable ? 0 : undefined}
+              onKeyDown={actionable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setUpdateDoc(doc); } } : undefined}
+            >
               <div className={s.docIcon}><IconFile size={18} /></div>
               <div className={s.docInfoFull}>
                 <div className={s.docName}>{doc.name}</div>
@@ -342,7 +348,7 @@ function DocumentsTab() {
                     <span className={s.docStatusNeedsUpdate}>
                       <IconAlertTriangle size={14} /> Needs update
                     </span>
-                    <button className={s.docUpdateBtn}>Update &rarr;</button>
+                    <button className={s.docUpdateBtn} onClick={() => setUpdateDoc(doc)}>Update &rarr;</button>
                   </span>
                 )}
                 {doc.status === 'add' && (
@@ -351,7 +357,8 @@ function DocumentsTab() {
               </div>
               <span className={s.docChevron}><IconChevronRight size={16} /></span>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -402,46 +409,200 @@ function DocumentsTab() {
           Learn how it works <span>&rarr;</span>
         </a>
       </div>
+
+      <DocumentUpdateModal doc={updateDoc} onClose={() => setUpdateDoc(null)} />
     </>
   );
 }
 
-function GovernmentRecordsTab({ property }) {
-  const hasNewRecord = GOVT_RECORDS.some(r => r.status === 'new-record');
+function formatSize(bytes) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / 1048576).toFixed(1)} MB`;
+}
+
+function DocumentUpdateModal({ doc, onClose }) {
+  const [files, setFiles] = useState([]);
+  const [saved, setSaved] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
+  const [terraAsked, setTerraAsked] = useState(false);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    setFiles([]);
+    setSaved(false);
+    setDragActive(false);
+    setTerraAsked(false);
+  }, [doc]);
+
+  if (!doc) return null;
+
+  const isAdd = doc.status === 'add';
+  const u = doc.update || {};
+  const heading = isAdd
+    ? `Add ${doc.name.toLowerCase()}`
+    : (u.heading || `${doc.name} needs an update`);
+  const subtext = isAdd
+    ? 'Add this document so Vault can keep it with your property records.'
+    : (u.subtext || 'A newer version of this record is available for this property.');
+
+  const addFiles = (list) => setFiles((prev) => [...prev, ...Array.from(list)]);
+  const handleDrag = (e) => {
+    e.preventDefault();
+    setDragActive(e.type === 'dragenter' || e.type === 'dragover');
+  };
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragActive(false);
+    if (e.dataTransfer.files?.length) addFiles(e.dataTransfer.files);
+  };
 
   return (
-    <>
-      {/* ── Heading ────────────────────────── */}
-      <div className={s.docsHeading}>
-        <h2 className={s.docsTitle}>Government records</h2>
-        <p className={s.docsDesc}>
-          Vault automatically checks government databases for any changes
-          related to your property. Here's the latest.
-        </p>
-      </div>
+    <Modal open={!!doc} onClose={onClose} title={heading} bare className={s.updateModal}>
+      <button className={s.umClose} onClick={onClose} aria-label="Close">
+        <IconX size={20} />
+      </button>
 
-      {/* ── Alert if new record found ──────── */}
-      {hasNewRecord && (
-        <div className={s.docAlert}>
-          <div className={s.docAlertIcon}>
-            <IconAlertCircle size={24} />
-          </div>
-          <div className={s.docAlertBody}>
-            <div className={s.docAlertTitle}>
-              New government record found
+      {saved ? (
+        <div className={s.umBody}>
+          <div className={s.modalSuccess}>
+            <div className={s.modalSuccessIcon}><IconCheckCircle size={30} /></div>
+            <div className={s.modalSuccessTitle}>Your document is being added</div>
+            <div className={s.modalSuccessDesc}>
+              We&apos;re saving &ldquo;{files[0]?.name}&rdquo; to your vault and checking it
+              against government records. We&apos;ll let you know once it&apos;s confirmed.
             </div>
-            <div className={s.docAlertDesc}>
-              A newer property registration was recorded in July 2025. This may affect your Encumbrance Certificate.
+            <div className={s.umFooter}>
+              <Button onClick={onClose}>Done</Button>
             </div>
-          </div>
-          <div className={s.docAlertAction}>
-            <button className={s.alertBtn}>
-              Review now <span>&rarr;</span>
-            </button>
           </div>
         </div>
-      )}
+      ) : (
+        <>
+          <div className={s.umHeader}>
+            <div className={s.umHeaderIcon}><IconFile size={20} /></div>
+            <div>
+              <h2 className={s.umHeading}>{heading}</h2>
+              <p className={s.umSubtext}>
+                <IconInfo size={15} />
+                <span>{subtext}</span>
+              </p>
+            </div>
+          </div>
 
+          <div className={s.umBody}>
+            {!isAdd && u.before && u.after && (
+              <div className={s.umCompare}>
+                <div className={`${s.umCard} ${s.umCardOld}`}>
+                  <div className={s.umCardMeta}>{u.before.meta}</div>
+                  <div className={s.umCardIcon}><IconFile size={16} /></div>
+                  <div className={s.umCardKind}>{u.before.kind}</div>
+                  <div className={s.umCardHeadline}>{u.before.headline}</div>
+                  <Button variant="secondary" size="sm" className={s.umCardBtn}>View</Button>
+                </div>
+                <div className={s.umArrow}><IconChevronRight size={20} /></div>
+                <div className={`${s.umCard} ${s.umCardNew}`}>
+                  <div className={`${s.umCardMeta} ${s.umCardMetaNew}`}>{u.after.meta}</div>
+                  <div className={`${s.umCardIcon} ${s.umCardIconNew}`}><IconFile size={16} /></div>
+                  <div className={s.umCardKind}>{u.after.kind}</div>
+                  <div className={`${s.umCardHeadline} ${s.umCardHeadlineNew}`}>{u.after.headline}</div>
+                </div>
+              </div>
+            )}
+
+            <div className={s.umDivider} />
+
+            <div className={s.umUploadTitle}>{u.uploadTitle || 'Add the latest document'}</div>
+            <p className={s.umUploadDesc}>
+              {u.uploadDesc || 'Upload the latest version to keep your records up to date.'}
+            </p>
+
+            <div
+              className={`${s.umDropzone} ${dragActive ? s.umDropzoneActive : ''}`}
+              onDragEnter={handleDrag}
+              onDragOver={handleDrag}
+              onDragLeave={handleDrag}
+              onDrop={handleDrop}
+              onClick={() => inputRef.current?.click()}
+              role="button"
+              tabIndex={0}
+              aria-label="Upload a document"
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inputRef.current?.click(); } }}
+            >
+              <div className={s.umDropIcon}><IconUploadCloud size={32} /></div>
+              <div className={s.umDropTitle}>Drop your document here</div>
+              <div className={s.umDropSub}>or <span className={s.umDropLink}>choose a file</span></div>
+              <div className={s.umDropHint}>PDF, JPG or PNG · Max 10 MB</div>
+              <input
+                ref={inputRef}
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                multiple
+                className={s.umHiddenInput}
+                onChange={(e) => { if (e.target.files?.length) addFiles(e.target.files); }}
+                tabIndex={-1}
+              />
+            </div>
+
+            {files.map((file, i) => (
+              <div key={i} className={s.umFile}>
+                <IconFile size={18} />
+                <span className={s.umFileName}>{file.name}</span>
+                <span className={s.umFileSize}>{formatSize(file.size)}</span>
+                <button
+                  className={s.umFileRemove}
+                  onClick={(e) => { e.stopPropagation(); setFiles(files.filter((_, idx) => idx !== i)); }}
+                  aria-label={`Remove ${file.name}`}
+                >
+                  <IconX size={16} />
+                </button>
+              </div>
+            ))}
+
+            <div className={s.umOr}>OR</div>
+
+            <div className={s.umHelp}>
+              <div className={s.umHelpIcon}>
+                {terraAsked ? <IconSparkle size={20} /> : <IconSearch size={18} />}
+              </div>
+              <div className={s.umHelpBody}>
+                <div className={s.umHelpTitle}>
+                  {terraAsked ? 'Terra is on it' : (u.help?.title || 'Not sure where to get it?')}
+                </div>
+                <div className={s.umHelpDesc}>
+                  {terraAsked
+                    ? 'Terra is checking government sources for the latest record. We’ll add it here automatically once it’s found.'
+                    : (u.help?.desc || 'Terra can look up the latest record from government sources for you.')}
+                </div>
+              </div>
+              {!terraAsked && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  iconRight={IconChevronRight}
+                  onClick={() => setTerraAsked(true)}
+                >
+                  Ask Terra
+                </Button>
+              )}
+            </div>
+
+            {files.length > 0 && (
+              <div className={s.umFooter}>
+                <Button variant="secondary" onClick={onClose}>Cancel</Button>
+                <Button onClick={() => setSaved(true)}>Save document</Button>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+    </Modal>
+  );
+}
+
+function GovernmentRecordsTab({ property }) {
+  return (
+    <>
       {/* ── Sources we check ───────────────── */}
       <div className={s.section}>
         <div className={s.sectionHeader}>
@@ -567,15 +728,6 @@ function ActivityTab({ property }) {
 
   return (
     <>
-      {/* ── Heading ────────────────────────── */}
-      <div className={s.docsHeading}>
-        <h2 className={s.docsTitle}>Activity</h2>
-        <p className={s.docsDesc}>
-          Everything that's happened with your property — document updates,
-          government checks, and monitoring alerts.
-        </p>
-      </div>
-
       {/* ── Filter chips ───────────────────── */}
       <div className={s.docFilters}>
         <div className={s.filterChips}>
@@ -670,72 +822,83 @@ function ActivityTab({ property }) {
 
 export default function PropertyPage({ params }) {
   const { id } = params;
-  const [activeTab, setActiveTab] = useState('Overview');
+  const [activeTab, setActiveTab] = useState('Documents');
   const property = PROPERTIES[id] || PROPERTIES[2];
 
   return (
     <div className={s.page}>
-      <Header
-        showSearch
-        showNav={activeTab !== 'Overview'}
-        navItems={[
-          { key: 'properties', label: 'My Properties', href: '/' },
-          { key: 'accounts', label: 'Accounts', href: '#' },
-          { key: 'help', label: 'Help', href: '#' },
-        ]}
-        hasNotifications
-        userInitials="K"
-      />
+      <Header showSearch hasNotifications userInitials="K" />
 
       <main className={s.main}>
-        <div className={s.subHeader}>
-          <a href={activeTab === 'Overview' ? '/' : '#'} className={s.backLink} onClick={(e) => {
-            if (activeTab !== 'Overview') {
-              e.preventDefault();
-              setActiveTab('Overview');
-            }
-          }}>
-            <IconChevronRight size={16} style={{ transform: 'rotate(180deg)' }} />
-            {activeTab === 'Overview' ? 'Back to your properties' : 'Back to property'}
-          </a>
-          {activeTab === 'Overview' && (
-            <button className={s.editBtn}>
-              <IconEdit size={16} />
-              Edit property
-            </button>
-          )}
-        </div>
-
         <div className={s.hero}>
-          <div className={s.heroImagePlaceholder} style={{ background: property.gradient }} />
-          <div className={s.heroOverlay} />
-          <div className={s.heroContent}>
-            <div className={s.heroLeft}>
-              <div className={s.heroType}>{property.type}</div>
-              <h1 className={s.heroTitle}>{property.name}</h1>
-              <div className={s.heroLocation}>{property.location}</div>
-              <div className={s.heroTags}>
-                {property.tags.map((tag) => (
-                  <span key={tag} className={s.heroTag}>{tag}</span>
-                ))}
+          <div className={s.heroMedia}>
+            <div
+              className={s.heroImagePlaceholder}
+              style={property.gradient ? { background: property.gradient } : undefined}
+            />
+            {property.image && (
+              <img
+                src={property.image}
+                alt={property.name}
+                className={s.heroImage}
+                loading="eager"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+            )}
+            <div className={s.heroShade} />
+          </div>
+
+          <div className={s.heroInner}>
+            <div className={s.heroScrim} />
+            <div className={s.heroTopBar}>
+              <a href="/" className={s.backLink}>
+                <IconChevronRight size={16} style={{ transform: 'rotate(180deg)' }} />
+                Back to your properties
+              </a>
+              <div className={s.heroActions}>
+                <button className={s.editBtn}>
+                  <IconEdit size={16} />
+                  Edit property
+                </button>
+                <button className={s.menuBtn} aria-label="More options">
+                  <IconMoreHorizontal size={18} />
+                </button>
               </div>
             </div>
-            {property.handwritten && (
-              <div className={s.heroRight}>
-                <div className={s.heroHandwritten}>
-                  {property.handwritten.split('\n').map((line, i) => (
-                    <span key={i}>{line}<br /></span>
-                  ))}
-                </div>
+
+            <div className={s.heroContent}>
+              <h1 className={s.heroTitle}>{property.name}</h1>
+              <div className={s.heroLocation}>
+                <IconMapPin size={17} />
+                {property.location}
               </div>
-            )}
+              <div className={s.heroPills}>
+                <span className={`${s.heroPill} ${
+                  property.status === 'all-good' ? s.heroPillGood :
+                  property.status === 'needs-attention' ? s.heroPillAttention :
+                  s.heroPillCheck
+                }`}>
+                  <span className={s.heroPillDot} />
+                  {property.status === 'all-good' ? 'All good' :
+                   property.status === 'needs-attention' ? 'Needs attention' :
+                   'Check needed'}
+                </span>
+                <span className={s.heroPillGlass}>{property.propertyType}</span>
+                <span className={s.heroPillGlass}>{property.area}</span>
+              </div>
+            </div>
+
+            <button className={s.mapBtn}>
+              <IconMapPin size={15} />
+              View on map
+            </button>
           </div>
         </div>
 
-        {activeTab === 'Overview' && property.alert && (
+        {property.alert && (
           <div className={s.alertBanner}>
             <div className={s.alertIcon}>
-              <IconAlertTriangle size={24} />
+              <IconAlertCircle size={22} />
             </div>
             <div className={s.alertBody}>
               <div className={s.alertLabel}>Needs your attention</div>
@@ -751,10 +914,12 @@ export default function PropertyPage({ params }) {
           </div>
         )}
 
-        <div className={s.tabs}>
+        <div className={s.tabs} role="tablist">
           {TAB_LIST.map((tab) => (
             <button
               key={tab}
+              role="tab"
+              aria-selected={activeTab === tab}
               className={`${s.tab} ${activeTab === tab ? s.tabActive : ''}`}
               onClick={() => setActiveTab(tab)}
             >
@@ -763,10 +928,12 @@ export default function PropertyPage({ params }) {
           ))}
         </div>
 
-        {activeTab === 'Overview' && <OverviewTab property={property} />}
-        {activeTab === 'Documents' && <DocumentsTab />}
-        {activeTab === 'Government records' && <GovernmentRecordsTab property={property} />}
-        {activeTab === 'Activity' && <ActivityTab property={property} />}
+        <div key={activeTab} className={s.tabPanel}>
+          {activeTab === 'Overview' && <OverviewTab property={property} />}
+          {activeTab === 'Documents' && <DocumentsTab />}
+          {activeTab === 'Government records' && <GovernmentRecordsTab property={property} />}
+          {activeTab === 'Activity' && <ActivityTab property={property} />}
+        </div>
       </main>
     </div>
   );

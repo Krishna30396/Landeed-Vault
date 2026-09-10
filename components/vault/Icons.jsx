@@ -48,3 +48,6 @@ export const IconEye = icon(<><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11
 export const IconDownload = icon(<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></>);
 export const IconBuilding = icon(<><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /><line x1="9" y1="6" x2="9" y2="6.01" /><line x1="15" y1="6" x2="15" y2="6.01" /><line x1="9" y1="10" x2="9" y2="10.01" /><line x1="15" y1="10" x2="15" y2="10.01" /><line x1="9" y1="14" x2="9" y2="14.01" /><line x1="15" y1="14" x2="15" y2="14.01" /><path d="M9 18h6" /></>);
 export const IconLandPlot = icon(<><path d="M2 22L12 2l10 20H2z" strokeWidth={0} fill="currentColor" opacity={0.12} /><path d="M2 22L12 2l10 20H2z" /></>);
+export const IconMoreHorizontal = icon(<><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" /></>);
+export const IconUploadCloud = icon(<><path d="M16 16l-4-4-4 4" /><path d="M12 12v9" /><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" /><polyline points="16 16 12 12 8 16" /></>);
+export const IconSparkle = icon(<><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z" /></>);

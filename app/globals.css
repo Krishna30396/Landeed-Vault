@@ -3,6 +3,8 @@
    ============================================================ */
 
 :root {
+  color-scheme: light;
+
   /* ── Color: Background ──────────────────────────────────── */
   --color-bg:              #F7F6F3;
   --color-surface:         #FFFFFF;
@@ -106,99 +108,8 @@
   --content-padding:    var(--space-6);
 }
 
-/* ── Dark Mode: System Preference ─────────────────────────── */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --color-bg:              #111513;
-    --color-surface:         #1A1F1C;
-    --color-surface-subtle:  #222824;
-    --color-surface-raised:  #252B27;
-
-    --color-text-primary:    #E4E6E4;
-    --color-text-secondary:  #A3A8A5;
-    --color-text-muted:      #6B706D;
-    --color-text-inverse:    #1A1D1B;
-
-    --color-border:          #2D332F;
-    --color-border-subtle:   #252B27;
-
-    --color-brand:           #3CB371;
-    --color-brand-hover:     #4CC882;
-    --color-brand-active:    #5DD893;
-    --color-brand-subtle:    #1A2E22;
-    --color-brand-text:      #3CB371;
-
-    --color-success:         #3CB371;
-    --color-success-bg:      #1A2E22;
-    --color-success-text:    #4CC882;
-
-    --color-warning:         #D97706;
-    --color-warning-bg:      #2D2214;
-    --color-warning-text:    #F59E0B;
-
-    --color-danger:          #E53E3E;
-    --color-danger-bg:       #2D1A1A;
-    --color-danger-text:     #FC8181;
-
-    --color-info:            #4299E1;
-    --color-info-bg:         #1A2332;
-    --color-info-text:       #63B3ED;
-
-    --color-focus:           rgba(60, 179, 113, 0.4);
-    --color-overlay:         rgba(0, 0, 0, 0.6);
-
-    --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.2);
-    --shadow-md:   0 2px 8px rgba(0, 0, 0, 0.3);
-    --shadow-lg:   0 4px 16px rgba(0, 0, 0, 0.35);
-    --shadow-xl:   0 8px 32px rgba(0, 0, 0, 0.4);
-  }
-}
-
-/* ── Dark Mode: Explicit Toggle ───────────────────────────── */
-:root[data-theme="dark"] {
-  --color-bg:              #111513;
-  --color-surface:         #1A1F1C;
-  --color-surface-subtle:  #222824;
-  --color-surface-raised:  #252B27;
-
-  --color-text-primary:    #E4E6E4;
-  --color-text-secondary:  #A3A8A5;
-  --color-text-muted:      #6B706D;
-  --color-text-inverse:    #1A1D1B;
-
-  --color-border:          #2D332F;
-  --color-border-subtle:   #252B27;
-
-  --color-brand:           #3CB371;
-  --color-brand-hover:     #4CC882;
-  --color-brand-active:    #5DD893;
-  --color-brand-subtle:    #1A2E22;
-  --color-brand-text:      #3CB371;
-
-  --color-success:         #3CB371;
-  --color-success-bg:      #1A2E22;
-  --color-success-text:    #4CC882;
-
-  --color-warning:         #D97706;
-  --color-warning-bg:      #2D2214;
-  --color-warning-text:    #F59E0B;
-
-  --color-danger:          #E53E3E;
-  --color-danger-bg:       #2D1A1A;
-  --color-danger-text:     #FC8181;
-
-  --color-info:            #4299E1;
-  --color-info-bg:         #1A2332;
-  --color-info-text:       #63B3ED;
-
-  --color-focus:           rgba(60, 179, 113, 0.4);
-  --color-overlay:         rgba(0, 0, 0, 0.6);
-
-  --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-md:   0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-lg:   0 4px 16px rgba(0, 0, 0, 0.35);
-  --shadow-xl:   0 8px 32px rgba(0, 0, 0, 0.4);
-}
+/* Vault is a light-mode-only product. No dark theme is defined —
+   the interface stays calm, warm, and consistent for every user. */
 
 /* ── Reset & Base ─────────────────────────────────────────── */
 *, *::before, *::after {

@@ -19,6 +19,7 @@ const PROPERTIES = [
     status: 'all-good',
     statusLabel: 'All good',
     checked: 'Checked today',
+    image: '/properties/apartment.jpg',
     gradient: 'linear-gradient(135deg, #6B8F6B 0%, #8FAF7F 40%, #A5C99E 100%)',
   },
   {
@@ -28,6 +29,7 @@ const PROPERTIES = [
     status: 'needs-attention',
     statusLabel: 'Needs attention',
     checked: 'Checked 2 days ago',
+    image: '/properties/family-land.jpg',
     gradient: 'linear-gradient(135deg, #7BA17B 0%, #9DBF8F 40%, #C5DEB0 100%)',
   },
   {
@@ -37,6 +39,7 @@ const PROPERTIES = [
     status: 'check-needed',
     statusLabel: 'Check needed',
     checked: 'Last checked 8 months ago',
+    image: '/properties/plot.jpg',
     gradient: 'linear-gradient(135deg, #6A9FB5 0%, #89B5C7 40%, #B0D4E0 100%)',
   },
 ];
@@ -78,9 +81,7 @@ export default function DashboardPage() {
         {/* ── Attention Banner ──────────────────── */}
         <div className={s.attention}>
           <div className={s.attentionImage}>
-            <div className={s.attentionImagePlaceholder}>
-              <IconHome size={32} />
-            </div>
+            <img src="/properties/family-land.jpg" alt="Family Land" />
           </div>
           <div className={s.attentionBody}>
             <div className={s.attentionLabel}>Needs your attention</div>
@@ -127,6 +128,15 @@ export default function DashboardPage() {
                     >
                       <IconHome size={36} style={{ opacity: 0.25, color: '#fff' }} />
                     </div>
+                    {prop.image && (
+                      <img
+                        src={prop.image}
+                        alt={prop.name}
+                        className={s.cardImage}
+                        loading="lazy"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      />
+                    )}
                     <button
                       className={s.cardMenu}
                       aria-label={`More options for ${prop.name}`}

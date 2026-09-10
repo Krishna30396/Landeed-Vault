@@ -9,6 +9,7 @@ export default function Modal({
   title,
   children,
   footer,
+  bare = false,
   className = '',
 }) {
   const overlayRef = useRef(null);
@@ -36,14 +37,20 @@ export default function Modal({
       aria-label={title}
     >
       <div className={`${s.modal} ${className}`}>
-        <div className={s.header}>
-          <h2 className={s.title}>{title}</h2>
-          <button className={s.close} onClick={onClose} aria-label="Close">
-            <IconX size={20} />
-          </button>
-        </div>
-        <div className={s.body}>{children}</div>
-        {footer && <div className={s.footer}>{footer}</div>}
+        {bare ? (
+          children
+        ) : (
+          <>
+            <div className={s.header}>
+              <h2 className={s.title}>{title}</h2>
+              <button className={s.close} onClick={onClose} aria-label="Close">
+                <IconX size={20} />
+              </button>
+            </div>
+            <div className={s.body}>{children}</div>
+            {footer && <div className={s.footer}>{footer}</div>}
+          </>
+        )}
       </div>
     </div>
   );
