@@ -119,7 +119,7 @@ export default function DashboardPage() {
             {PROPERTIES.map((prop) => {
               const st = STATUS_STYLES[prop.status];
               return (
-                <article key={prop.id} className={s.card} tabIndex={0}>
+                <a key={prop.id} href={`/property/${prop.id}`} className={s.card}>
                   <div className={s.cardImageWrap}>
                     <div
                       className={s.cardImagePlaceholder}
@@ -154,7 +154,7 @@ export default function DashboardPage() {
                       </span>
                     </div>
                   </div>
-                </article>
+                </a>
               );
             })}
           </div>
