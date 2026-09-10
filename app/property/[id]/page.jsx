@@ -85,6 +85,52 @@ const DOC_ACTIVITY = [
   { title: 'Sale deed added', desc: 'Document added by you.', date: '12 Jan 2023', dot: 'green' },
 ];
 
+const GOVT_RECORDS = [
+  { name: 'Encumbrance Certificate (EC)', source: 'IGRS Telangana', date: 'Last checked 18 Aug 2025', status: 'up-to-date', desc: 'No new encumbrances found since your last check.' },
+  { name: 'Property registration', source: 'Sub-Registrar Office', date: 'Last checked 18 Aug 2025', status: 'new-record', desc: 'A new registration was recorded in July 2025.' },
+  { name: 'Land revenue records (Pahani)', source: 'Dharani Portal', date: 'Last checked 15 Aug 2025', status: 'up-to-date', desc: 'Ownership details match your records.' },
+  { name: 'Prohibited list (Section 22A)', source: 'Revenue Department', date: 'Last checked 18 Aug 2025', status: 'clear', desc: 'This property is not on the prohibited list.' },
+  { name: 'Mutation status', source: 'Tahsildar Office', date: 'Last checked 10 Aug 2025', status: 'up-to-date', desc: 'Mutation records are up to date.' },
+  { name: 'RERA registration', source: 'Telangana RERA', date: 'Not applicable', status: 'na', desc: 'RERA applies to under-construction projects only.' },
+];
+
+const GOVT_CHECKS_TIMELINE = [
+  { title: 'New property registration found', desc: 'A newer registration was recorded at the Sub-Registrar Office. This may affect your EC.', date: '18 Aug 2025', dot: 'red' },
+  { title: 'Vault checked all government databases', desc: 'Checked IGRS, Dharani, Revenue Department, and RERA portals.', date: '18 Aug 2025', dot: 'green' },
+  { title: 'Prohibited list status cleared', desc: 'Property verified as not on Section 22A prohibited list.', date: '18 Aug 2025', dot: 'green' },
+  { title: 'Land revenue records verified', desc: 'Pahani / Dharani records match your ownership details.', date: '15 Aug 2025', dot: 'green' },
+];
+
+const GOVT_SOURCES = [
+  { name: 'IGRS Telangana', desc: 'Registration & encumbrance records', lastChecked: 'Today' },
+  { name: 'Dharani Portal', desc: 'Land ownership & revenue records', lastChecked: 'Today' },
+  { name: 'Revenue Department', desc: 'Prohibited land & mutation status', lastChecked: 'Today' },
+  { name: 'Telangana RERA', desc: 'Real estate regulatory records', lastChecked: '3 days ago' },
+];
+
+const ALL_ACTIVITY = [
+  { title: 'New property registration found', desc: 'A newer registration was recorded at the Sub-Registrar Office in July 2025.', date: '18 Aug 2025', dot: 'red', category: 'govt' },
+  { title: 'Vault checked all government databases', desc: 'Checked IGRS, Dharani, Revenue Department, and RERA portals. No other issues found.', date: '18 Aug 2025', dot: 'green', category: 'govt' },
+  { title: 'Property tax receipt marked as needing update', desc: 'We found a newer government record that may affect this document.', date: '26 Aug 2025', dot: 'red', category: 'documents' },
+  { title: 'Satellite monitoring — no changes', desc: 'No physical changes detected on the property in the latest satellite imagery.', date: '15 Aug 2025', dot: 'green', category: 'monitoring' },
+  { title: 'Prohibited list check — clear', desc: 'This property is not listed under Section 22A prohibited lands.', date: '18 Aug 2025', dot: 'green', category: 'govt' },
+  { title: 'Land revenue records verified', desc: 'Pahani / Dharani ownership details match your records.', date: '15 Aug 2025', dot: 'green', category: 'govt' },
+  { title: 'Encumbrance Certificate added', desc: 'Document uploaded by you.', date: '29 Mar 2024', dot: 'green', category: 'documents' },
+  { title: 'Property details updated', desc: 'You updated the area and survey number for this property.', date: '15 Mar 2024', dot: 'blue', category: 'property' },
+  { title: 'Sale deed added', desc: 'Document uploaded by you.', date: '12 Jan 2023', dot: 'green', category: 'documents' },
+  { title: 'Pattay / Pahani added', desc: 'Document uploaded by you.', date: '6 Feb 2023', dot: 'green', category: 'documents' },
+  { title: 'Property tax receipt added', desc: 'Document uploaded by you.', date: '10 Apr 2023', dot: 'green', category: 'documents' },
+  { title: 'Property added to Vault', desc: 'You added "Family Land" to your Vault. Vault will now monitor this property.', date: '8 Jan 2023', dot: 'green', category: 'property' },
+];
+
+const ACTIVITY_FILTERS = [
+  { key: 'all', label: 'All activity' },
+  { key: 'govt', label: 'Government records' },
+  { key: 'documents', label: 'Documents' },
+  { key: 'monitoring', label: 'Monitoring' },
+  { key: 'property', label: 'Property changes' },
+];
+
 const TAB_LIST = ['Overview', 'Documents', 'Government records', 'Activity'];
 
 const DOC_FILTERS = [
@@ -360,6 +406,268 @@ function DocumentsTab() {
   );
 }
 
+function GovernmentRecordsTab({ property }) {
+  const hasNewRecord = GOVT_RECORDS.some(r => r.status === 'new-record');
+
+  return (
+    <>
+      {/* ── Heading ────────────────────────── */}
+      <div className={s.docsHeading}>
+        <h2 className={s.docsTitle}>Government records</h2>
+        <p className={s.docsDesc}>
+          Vault automatically checks government databases for any changes
+          related to your property. Here's the latest.
+        </p>
+      </div>
+
+      {/* ── Alert if new record found ──────── */}
+      {hasNewRecord && (
+        <div className={s.docAlert}>
+          <div className={s.docAlertIcon}>
+            <IconAlertCircle size={24} />
+          </div>
+          <div className={s.docAlertBody}>
+            <div className={s.docAlertTitle}>
+              New government record found
+            </div>
+            <div className={s.docAlertDesc}>
+              A newer property registration was recorded in July 2025. This may affect your Encumbrance Certificate.
+            </div>
+          </div>
+          <div className={s.docAlertAction}>
+            <button className={s.alertBtn}>
+              Review now <span>&rarr;</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Sources we check ───────────────── */}
+      <div className={s.section}>
+        <div className={s.sectionHeader}>
+          <h2 className={s.sectionTitle}>
+            Sources we check <span className={s.sectionCount}>{GOVT_SOURCES.length}</span>
+          </h2>
+          <a href="#" className={s.sectionLink}>
+            How it works <IconChevronRight size={14} />
+          </a>
+        </div>
+        <div className={s.govtSourceGrid}>
+          {GOVT_SOURCES.map((src) => (
+            <div key={src.name} className={s.govtSourceCard}>
+              <div className={`${s.checkIcon} ${s.checkIconGreen}`}>
+                <IconCheckCircle size={18} />
+              </div>
+              <div className={s.govtSourceName}>{src.name}</div>
+              <div className={s.govtSourceDesc}>{src.desc}</div>
+              <div className={s.govtSourceTime}>Last checked: {src.lastChecked}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Records found ──────────────────── */}
+      <div className={s.section}>
+        <div className={s.sectionHeader}>
+          <h2 className={s.sectionTitle}>
+            Records found <span className={s.sectionCount}>{GOVT_RECORDS.length}</span>
+          </h2>
+        </div>
+        <div className={s.docList}>
+          {GOVT_RECORDS.map((rec) => (
+            <div key={rec.name} className={s.govtRecordRow}>
+              <div className={s.govtRecordIcon}>
+                {rec.status === 'new-record' ? (
+                  <IconAlertTriangle size={18} />
+                ) : rec.status === 'na' ? (
+                  <IconFile size={18} />
+                ) : (
+                  <IconCheckCircle size={18} />
+                )}
+              </div>
+              <div className={s.govtRecordInfo}>
+                <div className={s.govtRecordName}>{rec.name}</div>
+                <div className={s.govtRecordDesc}>{rec.desc}</div>
+              </div>
+              <div className={s.govtRecordMeta}>
+                <div className={s.govtRecordSource}>{rec.source}</div>
+                <div className={s.govtRecordDate}>{rec.date}</div>
+              </div>
+              <span className={s.govtRecordStatus}>
+                {rec.status === 'up-to-date' && (
+                  <span className={s.govtStatusGreen}>Up to date</span>
+                )}
+                {rec.status === 'new-record' && (
+                  <span className={s.govtStatusAmber}>New record found</span>
+                )}
+                {rec.status === 'clear' && (
+                  <span className={s.govtStatusGreen}>Clear</span>
+                )}
+                {rec.status === 'na' && (
+                  <span className={s.govtStatusMuted}>Not applicable</span>
+                )}
+              </span>
+              <span className={s.docChevron}><IconChevronRight size={16} /></span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Check timeline ─────────────────── */}
+      <div className={s.section}>
+        <div className={s.sectionHeader}>
+          <h2 className={s.sectionTitle}>Check history</h2>
+          <a href="#" className={s.sectionLink}>
+            See all checks <IconChevronRight size={14} />
+          </a>
+        </div>
+        <div className={s.activityList}>
+          {GOVT_CHECKS_TIMELINE.map((item, i) => (
+            <div key={i} className={s.activityRow}>
+              <div className={`${s.activityDot} ${item.dot === 'red' ? s.activityDotRed : s.activityDotGreen}`} />
+              <div className={s.activityBody}>
+                <div className={s.activityTitle}>{item.title}</div>
+                <div className={s.activityDesc}>{item.desc}</div>
+              </div>
+              {item.date && <div className={s.activityDate}>{item.date}</div>}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Bottom CTA ─────────────────────── */}
+      <div className={s.bottomCta}>
+        <div className={s.bottomCtaLeft}>
+          <div className={s.bottomCtaTitle}>Your property, always monitored</div>
+          <div className={s.bottomCtaDesc}>
+            Vault checks government records regularly so you never miss an update.
+            We'll notify you if anything changes.
+          </div>
+        </div>
+        <a href="#" className={s.bottomCtaLink}>
+          Learn how it works <span>&rarr;</span>
+        </a>
+      </div>
+    </>
+  );
+}
+
+function ActivityTab({ property }) {
+  const [activeFilter, setActiveFilter] = useState('all');
+  const filtered = activeFilter === 'all'
+    ? ALL_ACTIVITY
+    : ALL_ACTIVITY.filter(a => a.category === activeFilter);
+
+  const grouped = {};
+  filtered.forEach((item) => {
+    const month = item.date ? item.date.replace(/^\d+\s/, '') : 'Other';
+    if (!grouped[month]) grouped[month] = [];
+    grouped[month].push(item);
+  });
+
+  return (
+    <>
+      {/* ── Heading ────────────────────────── */}
+      <div className={s.docsHeading}>
+        <h2 className={s.docsTitle}>Activity</h2>
+        <p className={s.docsDesc}>
+          Everything that's happened with your property — document updates,
+          government checks, and monitoring alerts.
+        </p>
+      </div>
+
+      {/* ── Filter chips ───────────────────── */}
+      <div className={s.docFilters}>
+        <div className={s.filterChips}>
+          {ACTIVITY_FILTERS.map((f) => (
+            <button
+              key={f.key}
+              className={`${s.filterChip} ${activeFilter === f.key ? s.filterChipActive : ''}`}
+              onClick={() => setActiveFilter(f.key)}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Activity summary cards ─────────── */}
+      <div className={s.activitySummaryGrid}>
+        <div className={s.activitySummaryCard}>
+          <div className={s.activitySummaryNumber}>{ALL_ACTIVITY.length}</div>
+          <div className={s.activitySummaryLabel}>Total events</div>
+        </div>
+        <div className={s.activitySummaryCard}>
+          <div className={`${s.activitySummaryNumber} ${s.activitySummaryRed}`}>
+            {ALL_ACTIVITY.filter(a => a.dot === 'red').length}
+          </div>
+          <div className={s.activitySummaryLabel}>Need attention</div>
+        </div>
+        <div className={s.activitySummaryCard}>
+          <div className={`${s.activitySummaryNumber} ${s.activitySummaryGreen}`}>
+            {ALL_ACTIVITY.filter(a => a.category === 'govt').length}
+          </div>
+          <div className={s.activitySummaryLabel}>Govt checks</div>
+        </div>
+        <div className={s.activitySummaryCard}>
+          <div className={s.activitySummaryNumber}>
+            {ALL_ACTIVITY.filter(a => a.category === 'documents').length}
+          </div>
+          <div className={s.activitySummaryLabel}>Document updates</div>
+        </div>
+      </div>
+
+      {/* ── Grouped timeline ───────────────── */}
+      {Object.entries(grouped).map(([month, items]) => (
+        <div key={month} className={s.section}>
+          <div className={s.sectionHeader}>
+            <h2 className={s.sectionTitle}>{month}</h2>
+            <span className={s.activityMonthCount}>{items.length} events</span>
+          </div>
+          <div className={s.activityList}>
+            {items.map((item, i) => (
+              <div key={i} className={s.activityRow}>
+                <div className={`${s.activityDot} ${
+                  item.dot === 'red' ? s.activityDotRed :
+                  item.dot === 'blue' ? s.activityDotBlue :
+                  s.activityDotGreen
+                }`} />
+                <div className={s.activityBody}>
+                  <div className={s.activityTitle}>{item.title}</div>
+                  <div className={s.activityDesc}>{item.desc}</div>
+                </div>
+                <div className={s.activityMeta}>
+                  <div className={s.activityDate}>{item.date}</div>
+                  <div className={s.activityCategory}>{
+                    item.category === 'govt' ? 'Government' :
+                    item.category === 'documents' ? 'Documents' :
+                    item.category === 'monitoring' ? 'Monitoring' :
+                    'Property'
+                  }</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      {/* ── Bottom CTA ─────────────────────── */}
+      <div className={s.bottomCta}>
+        <div className={s.bottomCtaLeft}>
+          <div className={s.bottomCtaTitle}>Always in the loop</div>
+          <div className={s.bottomCtaDesc}>
+            Vault tracks every change and check so you have a complete
+            history of your property. We'll alert you when something needs attention.
+          </div>
+        </div>
+        <a href="#" className={s.bottomCtaLink}>
+          Notification settings <span>&rarr;</span>
+        </a>
+      </div>
+    </>
+  );
+}
+
 export default function PropertyPage({ params }) {
   const { id } = params;
   const [activeTab, setActiveTab] = useState('Overview');
@@ -369,7 +677,7 @@ export default function PropertyPage({ params }) {
     <div className={s.page}>
       <Header
         showSearch
-        showNav={activeTab === 'Documents'}
+        showNav={activeTab !== 'Overview'}
         navItems={[
           { key: 'properties', label: 'My Properties', href: '/' },
           { key: 'accounts', label: 'Accounts', href: '#' },
@@ -381,14 +689,14 @@ export default function PropertyPage({ params }) {
 
       <main className={s.main}>
         <div className={s.subHeader}>
-          <a href={activeTab === 'Documents' ? '#' : '/'} className={s.backLink} onClick={(e) => {
+          <a href={activeTab === 'Overview' ? '/' : '#'} className={s.backLink} onClick={(e) => {
             if (activeTab !== 'Overview') {
               e.preventDefault();
               setActiveTab('Overview');
             }
           }}>
             <IconChevronRight size={16} style={{ transform: 'rotate(180deg)' }} />
-            {activeTab === 'Documents' ? 'Back to property' : 'Back to your properties'}
+            {activeTab === 'Overview' ? 'Back to your properties' : 'Back to property'}
           </a>
           {activeTab === 'Overview' && (
             <button className={s.editBtn}>
@@ -457,6 +765,8 @@ export default function PropertyPage({ params }) {
 
         {activeTab === 'Overview' && <OverviewTab property={property} />}
         {activeTab === 'Documents' && <DocumentsTab />}
+        {activeTab === 'Government records' && <GovernmentRecordsTab property={property} />}
+        {activeTab === 'Activity' && <ActivityTab property={property} />}
       </main>
     </div>
   );

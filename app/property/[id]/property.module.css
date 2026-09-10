@@ -821,6 +821,192 @@
   background: rgba(255,255,255,0.15);
 }
 
+/* ── Government Records Tab ──────────────────── */
+
+.govtSourceGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+}
+
+.govtSourceCard {
+  background: var(--color-surface-subtle);
+  border-radius: var(--radius-sm);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.govtSourceName {
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.govtSourceDesc {
+  font-size: var(--text-caption);
+  color: var(--color-text-muted);
+  line-height: var(--leading-normal);
+}
+
+.govtSourceTime {
+  font-size: var(--text-caption);
+  color: var(--color-text-muted);
+  margin-top: auto;
+}
+
+.govtRecordRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5) 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.govtRecordRow:last-child {
+  border-bottom: none;
+}
+
+.govtRecordIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--color-surface-subtle);
+  color: var(--color-text-muted);
+}
+
+.govtRecordRow:has(.govtStatusGreen) .govtRecordIcon {
+  color: var(--color-success);
+}
+
+.govtRecordRow:has(.govtStatusAmber) .govtRecordIcon {
+  background: var(--color-warning-subtle);
+  color: var(--color-warning);
+}
+
+.govtRecordInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.govtRecordName {
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-primary);
+}
+
+.govtRecordDesc {
+  font-size: var(--text-caption);
+  color: var(--color-text-muted);
+  line-height: var(--leading-normal);
+}
+
+.govtRecordMeta {
+  width: 180px;
+  flex-shrink: 0;
+}
+
+.govtRecordSource {
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.govtRecordDate {
+  font-size: var(--text-caption);
+  color: var(--color-text-muted);
+}
+
+.govtRecordStatus {
+  width: 140px;
+  flex-shrink: 0;
+}
+
+.govtStatusGreen {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-success-text);
+}
+
+.govtStatusAmber {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-warning-text);
+}
+
+.govtStatusMuted {
+  font-size: var(--text-body-sm);
+  color: var(--color-text-muted);
+}
+
+/* ── Activity Tab ────────────────────────────── */
+
+.activitySummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.activitySummaryCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  text-align: center;
+}
+
+.activitySummaryNumber {
+  font-size: var(--text-h2);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.activitySummaryRed {
+  color: var(--color-danger-text);
+}
+
+.activitySummaryGreen {
+  color: var(--color-success-text);
+}
+
+.activitySummaryLabel {
+  font-size: var(--text-caption);
+  color: var(--color-text-muted);
+}
+
+.activityDotBlue {
+  background: var(--color-brand);
+}
+
+.activityMonthCount {
+  font-size: var(--text-body-sm);
+  color: var(--color-text-muted);
+}
+
+.activityMeta {
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.activityCategory {
+  font-size: var(--text-caption);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
 /* ── Responsive ───────────────────────────────── */
 
 @media (max-width: 1024px) {
@@ -828,6 +1014,12 @@
     grid-template-columns: repeat(2, 1fr);
   }
   .checksGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .govtSourceGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .activitySummaryGrid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -905,6 +1097,27 @@
   }
 
   .docStatusCol {
+    width: auto;
+  }
+
+  .activitySummaryGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .govtSourceGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .govtRecordRow {
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .govtRecordMeta {
+    width: auto;
+  }
+
+  .govtRecordStatus {
     width: auto;
   }
 }
