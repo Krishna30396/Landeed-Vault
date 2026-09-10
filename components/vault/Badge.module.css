@@ -1,0 +1,90 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-sans);
+  font-weight: var(--weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+  border-radius: var(--radius-full);
+}
+
+.sm {
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  height: 24px;
+}
+
+.md {
+  font-size: var(--text-body-sm);
+  padding: 4px 14px;
+  height: 28px;
+}
+
+.lg {
+  font-size: var(--text-body-sm);
+  padding: 6px 16px;
+  height: 32px;
+}
+
+/* ── Status variants ───────────────────────────── */
+
+.allGood {
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.needsAttention {
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
+}
+
+.checkNeeded {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+.missingInfo {
+  background: var(--color-info-bg);
+  color: var(--color-info-text);
+}
+
+.couldntCheck {
+  background: var(--color-surface-subtle);
+  color: var(--color-text-muted);
+}
+
+/* ── Generic semantic variants ─────────────────── */
+
+.success {
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.warning {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+.danger {
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
+}
+
+.info {
+  background: var(--color-info-bg);
+  color: var(--color-info-text);
+}
+
+.neutral {
+  background: var(--color-surface-subtle);
+  color: var(--color-text-secondary);
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}

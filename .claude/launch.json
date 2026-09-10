@@ -2,10 +2,22 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "halfway-dev",
+      "name": "vault-dev",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 3000
+    },
+    {
+      "name": "ai-creative-partner",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "../ai-creative-partner"],
+      "port": 5173
+    },
+    {
+      "name": "feg-moments-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "feg-moments/web"],
+      "port": 5180
     }
   ]
 }

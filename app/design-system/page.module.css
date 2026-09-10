@@ -1,0 +1,228 @@
+.page {
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.main {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: var(--space-12) var(--content-padding) var(--space-20);
+}
+
+.hero {
+  margin-bottom: var(--space-16);
+}
+
+.heroTitle {
+  font-size: 3rem;
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+  line-height: 1.1;
+  margin-bottom: var(--space-4);
+}
+
+.heroSub {
+  font-size: var(--text-body-lg);
+  color: var(--color-text-secondary);
+  max-width: 600px;
+  line-height: var(--leading-relaxed);
+}
+
+/* Section */
+.section {
+  margin-bottom: var(--space-16);
+}
+
+.sectionTitle {
+  font-size: var(--text-h2);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.sectionDesc {
+  font-size: var(--text-body);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-8);
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-border-subtle);
+  border: none;
+  margin: var(--space-16) 0;
+}
+
+/* Swatches */
+.swatchGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-4);
+}
+
+.swatch {
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle);
+}
+
+.swatchColor {
+  height: 72px;
+}
+
+.swatchLabel {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-caption);
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+}
+
+.swatchVar {
+  font-family: monospace;
+  font-size: 11px;
+  display: block;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+/* Typography specimen */
+.typeRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-8);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.typeLabel {
+  width: 100px;
+  font-size: var(--text-caption);
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.typeSample {
+  flex: 1;
+}
+
+.typeMeta {
+  font-size: var(--text-caption);
+  color: var(--color-text-muted);
+  font-family: monospace;
+  width: 160px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+/* Spacing demo */
+.spacingRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-2);
+}
+
+.spacingBar {
+  height: 24px;
+  background: var(--color-brand-subtle);
+  border: 1px solid var(--color-brand);
+  border-radius: 4px;
+}
+
+.spacingLabel {
+  font-size: var(--text-caption);
+  color: var(--color-text-muted);
+  font-family: monospace;
+  width: 80px;
+  flex-shrink: 0;
+}
+
+/* Component rows */
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-6);
+}
+
+.rowLabel {
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-secondary);
+  width: 100%;
+  margin-bottom: var(--space-1);
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+}
+
+.grid3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+}
+
+.surface {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+}
+
+.inputRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+  max-width: 600px;
+}
+
+.docList {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: var(--space-5);
+}
+
+.radiusRow {
+  display: flex;
+  gap: var(--space-6);
+  align-items: flex-end;
+}
+
+.radiusBox {
+  width: 80px;
+  height: 80px;
+  background: var(--color-brand-subtle);
+  border: 2px solid var(--color-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-caption);
+  color: var(--color-brand-text);
+  font-family: monospace;
+}
+
+@media (max-width: 768px) {
+  .heroTitle { font-size: 2rem; }
+  .grid2, .grid3 { grid-template-columns: 1fr; }
+  .inputRow { grid-template-columns: 1fr; }
+  .cardGrid { grid-template-columns: 1fr; }
+  .typeRow { flex-direction: column; gap: var(--space-2); }
+  .typeMeta { text-align: left; width: auto; }
+}

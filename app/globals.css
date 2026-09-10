@@ -1,179 +1,261 @@
+/* ============================================================
+   VAULT DESIGN SYSTEM — Design Tokens
+   ============================================================ */
+
 :root {
-  --paper:     #E9ECE4;  /* app background — cool paper-green, not cream */
-  --panel:     #FFFFFF;  /* cards, input surfaces */
-  --ink:       #1E2A24;  /* primary text — deep forest, never pure black */
-  --muted:     #6B7A70;  /* secondary text, labels */
-  --contour:   #C6D0C1;  /* hairlines, dividers, borders */
-  --marker:    #C51162;  /* THE midpoint. Nothing else. */
-  --route:     #2F6F5E;  /* selected route line */
-  --route-alt: #9FB0A6;  /* unselected alternate routes */
-  --error:     #8A3232;  /* error text ONLY — a state colour, not an accent */
-  /* --font-display / --font-body / --font-mono are set on <html> by next/font. */
+  /* ── Color: Background ──────────────────────────────────── */
+  --color-bg:              #F7F6F3;
+  --color-surface:         #FFFFFF;
+  --color-surface-subtle:  #F0EFEC;
+  --color-surface-raised:  #FFFFFF;
+
+  /* ── Color: Text ────────────────────────────────────────── */
+  --color-text-primary:    #1A1D1B;
+  --color-text-secondary:  #4A4F4C;
+  --color-text-muted:      #868B88;
+  --color-text-inverse:    #FFFFFF;
+
+  /* ── Color: Border ──────────────────────────────────────── */
+  --color-border:          #E2E1DE;
+  --color-border-subtle:   #EBEAE7;
+
+  /* ── Color: Brand (Deep Green) ──────────────────────────── */
+  --color-brand:           #1A6B4A;
+  --color-brand-hover:     #155A3E;
+  --color-brand-active:    #104D35;
+  --color-brand-subtle:    #E6F2EC;
+  --color-brand-text:      #1A6B4A;
+
+  /* ── Color: Semantic ────────────────────────────────────── */
+  --color-success:         #1A7A4A;
+  --color-success-bg:      #E6F5ED;
+  --color-success-text:    #15633C;
+
+  --color-warning:         #B45309;
+  --color-warning-bg:      #FEF3E2;
+  --color-warning-text:    #92400E;
+
+  --color-danger:          #C53030;
+  --color-danger-bg:       #FEF2F2;
+  --color-danger-text:     #9B2C2C;
+
+  --color-info:            #2B6CB0;
+  --color-info-bg:         #EBF4FF;
+  --color-info-text:       #2C5282;
+
+  /* ── Color: Interactive ─────────────────────────────────── */
+  --color-focus:           rgba(26, 107, 74, 0.4);
+  --color-overlay:         rgba(0, 0, 0, 0.4);
+
+  /* ── Typography ─────────────────────────────────────────── */
+  --font-sans:             var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
+
+  --text-display:          2.25rem;    /* 36px */
+  --text-h1:               1.875rem;   /* 30px */
+  --text-h2:               1.5rem;     /* 24px */
+  --text-h3:               1.25rem;    /* 20px */
+  --text-body-lg:          1.125rem;   /* 18px */
+  --text-body:             1rem;       /* 16px */
+  --text-body-sm:          0.875rem;   /* 14px */
+  --text-caption:          0.8125rem;  /* 13px */
+  --text-button:           0.9375rem;  /* 15px */
+  --text-label:            0.875rem;   /* 14px */
+
+  --leading-tight:         1.2;
+  --leading-snug:          1.3;
+  --leading-normal:        1.5;
+  --leading-relaxed:       1.6;
+
+  --weight-normal:         400;
+  --weight-medium:         500;
+  --weight-semibold:       600;
+
+  /* ── Spacing ────────────────────────────────────────────── */
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-8:   32px;
+  --space-10:  40px;
+  --space-12:  48px;
+  --space-16:  64px;
+  --space-20:  80px;
+
+  /* ── Border Radius ──────────────────────────────────────── */
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   20px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ────────────────────────────────────────────── */
+  --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md:   0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg:   0 4px 16px rgba(0, 0, 0, 0.10);
+  --shadow-xl:   0 8px 32px rgba(0, 0, 0, 0.12);
+
+  /* ── Transitions ────────────────────────────────────────── */
+  --transition-fast:  150ms ease;
+  --transition-base:  200ms ease;
+  --transition-slow:  300ms ease;
+
+  /* ── Layout ─────────────────────────────────────────────── */
+  --content-max-width:  1120px;
+  --content-padding:    var(--space-6);
 }
 
-* {
+/* ── Dark Mode: System Preference ─────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg:              #111513;
+    --color-surface:         #1A1F1C;
+    --color-surface-subtle:  #222824;
+    --color-surface-raised:  #252B27;
+
+    --color-text-primary:    #E4E6E4;
+    --color-text-secondary:  #A3A8A5;
+    --color-text-muted:      #6B706D;
+    --color-text-inverse:    #1A1D1B;
+
+    --color-border:          #2D332F;
+    --color-border-subtle:   #252B27;
+
+    --color-brand:           #3CB371;
+    --color-brand-hover:     #4CC882;
+    --color-brand-active:    #5DD893;
+    --color-brand-subtle:    #1A2E22;
+    --color-brand-text:      #3CB371;
+
+    --color-success:         #3CB371;
+    --color-success-bg:      #1A2E22;
+    --color-success-text:    #4CC882;
+
+    --color-warning:         #D97706;
+    --color-warning-bg:      #2D2214;
+    --color-warning-text:    #F59E0B;
+
+    --color-danger:          #E53E3E;
+    --color-danger-bg:       #2D1A1A;
+    --color-danger-text:     #FC8181;
+
+    --color-info:            #4299E1;
+    --color-info-bg:         #1A2332;
+    --color-info-text:       #63B3ED;
+
+    --color-focus:           rgba(60, 179, 113, 0.4);
+    --color-overlay:         rgba(0, 0, 0, 0.6);
+
+    --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-md:   0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-lg:   0 4px 16px rgba(0, 0, 0, 0.35);
+    --shadow-xl:   0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* ── Dark Mode: Explicit Toggle ───────────────────────────── */
+:root[data-theme="dark"] {
+  --color-bg:              #111513;
+  --color-surface:         #1A1F1C;
+  --color-surface-subtle:  #222824;
+  --color-surface-raised:  #252B27;
+
+  --color-text-primary:    #E4E6E4;
+  --color-text-secondary:  #A3A8A5;
+  --color-text-muted:      #6B706D;
+  --color-text-inverse:    #1A1D1B;
+
+  --color-border:          #2D332F;
+  --color-border-subtle:   #252B27;
+
+  --color-brand:           #3CB371;
+  --color-brand-hover:     #4CC882;
+  --color-brand-active:    #5DD893;
+  --color-brand-subtle:    #1A2E22;
+  --color-brand-text:      #3CB371;
+
+  --color-success:         #3CB371;
+  --color-success-bg:      #1A2E22;
+  --color-success-text:    #4CC882;
+
+  --color-warning:         #D97706;
+  --color-warning-bg:      #2D2214;
+  --color-warning-text:    #F59E0B;
+
+  --color-danger:          #E53E3E;
+  --color-danger-bg:       #2D1A1A;
+  --color-danger-text:     #FC8181;
+
+  --color-info:            #4299E1;
+  --color-info-bg:         #1A2332;
+  --color-info-text:       #63B3ED;
+
+  --color-focus:           rgba(60, 179, 113, 0.4);
+  --color-overlay:         rgba(0, 0, 0, 0.6);
+
+  --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md:   0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-lg:   0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-xl:   0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Reset & Base ─────────────────────────────────────────── */
+*, *::before, *::after {
   box-sizing: border-box;
 }
 
-html,
-body {
+html, body {
   margin: 0;
   padding: 0;
   height: 100%;
 }
 
 body {
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--font-body), 'Public Sans', system-ui, sans-serif;
-  font-size: 15px;
-  line-height: 1.5;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--leading-relaxed);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3 {
-  font-family: var(--font-display), 'Bricolage Grotesque', sans-serif;
-  font-weight: 600;
+h1, h2, h3, h4, h5, h6 {
   margin: 0;
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
 }
 
-button {
-  font-family: inherit;
-}
+p { margin: 0; }
 
-input {
+button, input, select, textarea {
   font-family: inherit;
+  font-size: inherit;
 }
 
 a {
-  color: var(--route);
-}
-
-:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 2px;
-  border-radius: 2px;
-}
-
-/* Once a route is drawn the basemap goes quiet — streets fade to grey so the
-   route, hub and category pins are the only colour on the map. */
-.tiles-muted .leaflet-tile-pane {
-  filter: grayscale(0.92) saturate(0.3) brightness(1.04) contrast(0.92);
-}
-
-/* Candidate hub pins: a quiet dot with a slowly breathing ring. */
-.pulse-pin {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--route);
-  border: 2px solid #fff;
-  box-shadow: 0 1px 3px rgba(30, 42, 36, 0.35);
-  position: relative;
-}
-
-.pulse-pin::after {
-  content: '';
-  position: absolute;
-  inset: -7px;
-  border-radius: 50%;
-  border: 2px solid rgba(47, 111, 94, 0.55);
-  animation: hub-pulse 1.8s ease-out infinite;
-}
-
-@keyframes hub-pulse {
-  0% {
-    transform: scale(0.55);
-    opacity: 0.9;
-  }
-  100% {
-    transform: scale(1.5);
-    opacity: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .pulse-pin::after {
-    animation: none;
-    transform: scale(1);
-    opacity: 0.4;
-  }
-}
-
-/* Place popup — Leaflet's popup DOM lives outside CSS modules. */
-.leaflet-popup-content-wrapper {
-  background: var(--panel);
-  color: var(--ink);
-  border: 1px solid var(--contour);
-  border-radius: 8px;
-  box-shadow: 0 6px 24px rgba(30, 42, 36, 0.18);
-}
-
-.leaflet-popup-tip {
-  background: var(--panel);
-  border: 1px solid var(--contour);
-}
-
-.leaflet-popup-content {
-  margin: 12px 14px;
-  font-family: var(--font-body), 'Public Sans', system-ui, sans-serif;
-  font-size: 13px;
-  line-height: 1.45;
-  min-width: 180px;
-}
-
-.place-popup strong {
-  font-size: 14.5px;
-  display: block;
-  margin-bottom: 2px;
-}
-
-.place-popup-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--muted);
-}
-
-.place-popup-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.place-popup-row {
-  color: var(--muted);
-  margin-top: 3px;
-}
-
-.place-popup-hours {
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
-  font-size: 11px;
-  color: var(--muted);
-  margin-top: 3px;
-}
-
-.place-popup-links {
-  display: flex;
-  gap: 14px;
-  margin-top: 8px;
-}
-
-.place-popup-links a {
-  color: var(--route);
-  font-weight: 600;
+  color: var(--color-brand-text);
   text-decoration: none;
 }
 
-.place-popup-links a:hover {
+a:hover {
   text-decoration: underline;
 }
 
+img {
+  max-width: 100%;
+  display: block;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;

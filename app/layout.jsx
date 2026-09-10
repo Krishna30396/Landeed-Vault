@@ -1,33 +1,25 @@
 import './globals.css';
-import { Bricolage_Grotesque, Public_Sans, JetBrains_Mono } from 'next/font/google';
+import { Inter } from 'next/font/google';
 
-const display = Bricolage_Grotesque({
+const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-display',
-  display: 'swap',
-});
-
-const body = Public_Sans({
-  subsets: ['latin'],
-  variable: '--font-body',
-  display: 'swap',
-});
-
-const mono = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-mono',
+  variable: '--font-inter',
   display: 'swap',
 });
 
 export const metadata = {
-  title: 'Halfway — a fair meeting point',
-  description:
-    'Two locations in. One fair meeting point out. Find the halfway point between two people along real roads, snapped to a real town, with places to meet.',
+  title: 'Vault by Landeed',
+  description: 'Vault watches over your properties, tells you when something changes, and guides you on what to do next.',
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
+    <html lang="en" className={inter.variable}>
       <body>{children}</body>
     </html>
   );
