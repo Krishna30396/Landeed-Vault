@@ -15,6 +15,8 @@ import {
   IconExclamation,
   IconFileText,
   IconX,
+  IconCheckCircle,
+  IconAlertTriangle,
 } from '@/components/vault/Icons';
 
 function getGreeting() {
@@ -84,6 +86,39 @@ const TYPE_ICON = {
   'Agricultural Land': IconLeaf,
   'Residential Plot': IconLandPlot,
 };
+
+const RECENT_UPDATES = [
+  {
+    title: 'Property tax receipt needs an update',
+    desc: 'Family Land — a newer tax record is available for this property.',
+    date: '26 Aug 2025',
+    dot: 'red',
+  },
+  {
+    title: 'New property record found',
+    desc: 'Family Land — we found a newer registration in government data.',
+    date: '18 Aug 2025',
+    dot: 'red',
+  },
+  {
+    title: 'Vault checked government records',
+    desc: 'Green Meadows — no new issues found.',
+    date: 'Today',
+    dot: 'green',
+  },
+  {
+    title: 'Encumbrance Certificate added',
+    desc: 'Family Land — document added by you.',
+    date: '29 Mar 2024',
+    dot: 'green',
+  },
+  {
+    title: 'Satellite monitoring — no changes',
+    desc: 'Lakeview Plot — no physical changes detected.',
+    date: '8 months ago',
+    dot: 'green',
+  },
+];
 
 export default function DashboardPage() {
   const greeting = getGreeting();
@@ -245,24 +280,28 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        {/* ── Add Property CTA ──────────────────── */}
-        <section className={s.addCta}>
-          <div className={s.addCtaLeft}>
-            <span className={s.addCtaLabel}>A safer tomorrow</span>
-            <h2 className={s.addCtaTitle}>Add another property</h2>
-            <p className={s.addCtaDesc}>
-              Keep all your properties in one place. We'll check for updates
-              and let you know if anything needs your attention.
-            </p>
-            <div>
-              <Button icon={IconPlus}>Add property</Button>
-            </div>
+        {/* ── Recent Updates ─────────────────────── */}
+        <section>
+          <div className={s.updatesHeader}>
+            <h2 className={s.updatesTitle}>Recent updates</h2>
+            <a href="#" className={s.updatesLink}>
+              See all activity <IconChevronRight size={14} />
+            </a>
           </div>
-          <div className={s.addCtaRight}>
-            <div className={s.addCtaImagePlaceholder}>
-              <span className={s.handwrittenText}>
-                Your properties,<br />looked after.
-              </span>
+          <div className={s.updatesSection}>
+            <div className={s.updatesList}>
+              {RECENT_UPDATES.map((item, i) => (
+                <div key={i} className={s.updateRow}>
+                  <span className={`${s.updateIcon} ${item.dot === 'red' ? s.updateIconRed : s.updateIconGreen}`}>
+                    {item.dot === 'red' ? <IconAlertTriangle size={14} /> : <IconCheckCircle size={14} />}
+                  </span>
+                  <div className={s.updateBody}>
+                    <div className={s.updateTitle}>{item.title}</div>
+                    <div className={s.updateDesc}>{item.desc}</div>
+                  </div>
+                  <div className={s.updateDate}>{item.date}</div>
+                </div>
+              ))}
             </div>
           </div>
         </section>

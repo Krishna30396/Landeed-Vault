@@ -22,6 +22,12 @@ import {
   IconPlus,
   IconX,
   IconMoreHorizontal,
+  IconCalendar,
+  IconDownload,
+  IconExternalLink,
+  IconHeadphones,
+  IconFileText,
+  IconExclamation,
 } from '@/components/vault/Icons';
 
 const PROPERTIES = {
@@ -70,11 +76,12 @@ const PROPERTIES = {
 };
 
 const DOCUMENTS = [
-  { name: 'Sale deed', desc: 'Proof of ownership', date: 'Added on 12 Jan 2023', status: 'added' },
-  { name: 'Encumbrance Certificate (EC)', desc: 'Shows if there are any loans or liabilities', date: 'Added on 29 Mar 2024', status: 'added' },
+  { name: 'Sale deed', desc: 'Proof of ownership', category: 'Ownership', date: 'Added on 12 Jan 2023', status: 'added' },
+  { name: 'Encumbrance Certificate (EC)', desc: 'Shows if there are any loans or liabilities', category: 'Legal', date: 'Added on 29 Mar 2024', status: 'added' },
   {
     name: 'Property tax receipt',
     desc: 'Latest property tax payment',
+    category: 'Tax',
     date: 'Added on 10 Apr 2023',
     status: 'needs-update',
     update: {
@@ -90,8 +97,8 @@ const DOCUMENTS = [
       },
     },
   },
-  { name: 'Pattay / Pahani', desc: 'Land ownership record (Telangana)', date: 'Added on 6 Feb 2023', status: 'added' },
-  { name: 'Other document', desc: 'Any other relevant document', date: 'No documents added', status: 'add' },
+  { name: 'Pattay / Pahani', desc: 'Land ownership record (Telangana)', category: 'Land record', date: 'Added on 6 Feb 2023', status: 'added' },
+  { name: 'Mutation certificate', desc: 'Shows latest ownership changes', category: 'Legal', date: null, status: 'missing' },
 ];
 
 const CHECKS = [
@@ -164,8 +171,8 @@ const TAB_LIST = ['Documents', 'Overview', 'Government records', 'Activity'];
 const DOC_FILTERS = [
   { key: 'all', label: 'All', count: 5 },
   { key: 'added', label: 'Added', count: 3 },
-  { key: 'needs-update', label: 'Needs update', count: 1 },
-  { key: 'missing', label: 'Missing', count: 1 },
+  { key: 'needs-update', label: 'Needs update', count: 1, tone: 'danger' },
+  { key: 'missing', label: 'Missing', count: 1, tone: 'warning' },
 ];
 
 function OverviewTab({ property }) {
@@ -220,10 +227,10 @@ function OverviewTab({ property }) {
               <span className={
                 doc.status === 'added' ? s.docStatusAdded :
                 doc.status === 'needs-update' ? s.docStatusNeedsUpdate :
-                s.docStatusAdd
+                s.docStatusMissing
               }>
                 {doc.status === 'added' ? 'Added' :
-                 doc.status === 'needs-update' ? 'Needs update' : 'Add'}
+                 doc.status === 'needs-update' ? 'Needs update' : 'Missing'}
               </span>
               <span className={s.docChevron}><IconChevronRight size={16} /></span>
             </div>
@@ -290,53 +297,86 @@ function OverviewTab({ property }) {
 
 function DocumentsTab() {
   const [activeFilter, setActiveFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [updateDoc, setUpdateDoc] = useState(null);
-  const filtered = activeFilter === 'all' ? DOCUMENTS :
-    activeFilter === 'added' ? DOCUMENTS.filter(d => d.status === 'added') :
-    activeFilter === 'needs-update' ? DOCUMENTS.filter(d => d.status === 'needs-update') :
-    DOCUMENTS.filter(d => d.status === 'add');
+  const [previewDoc, setPreviewDoc] = useState(null);
+
+  const byFilter = activeFilter === 'all' ? DOCUMENTS : DOCUMENTS.filter((d) => d.status === activeFilter);
+  const query = searchQuery.trim().toLowerCase();
+  const filtered = query ? byFilter.filter((d) => d.name.toLowerCase().includes(query)) : byFilter;
 
   return (
     <>
-      {/* ── Filter chips ───────────────────── */}
+      {/* ── Filters, search, sort ───────────── */}
       <div className={s.docFilters}>
         <div className={s.filterChips}>
           {DOC_FILTERS.map((f) => (
             <button
               key={f.key}
-              className={`${s.filterChip} ${activeFilter === f.key ? s.filterChipActive : ''}`}
+              className={`${s.filterChip} ${activeFilter === f.key ? s.filterChipActive : ''} ${
+                f.tone === 'danger' ? s.filterChipDanger : f.tone === 'warning' ? s.filterChipWarning : ''
+              }`}
               onClick={() => setActiveFilter(f.key)}
             >
+              {f.tone === 'danger' && <IconAlertTriangle size={13} />}
+              {f.tone === 'warning' && <IconAlertCircle size={13} />}
               {f.label} ({f.count})
             </button>
           ))}
         </div>
-        <div className={s.filterRight}>
-          <span className={s.filterLabel}>Sort by</span>
-          <span className={s.filterLabel}>Document type</span>
+
+        <div className={s.docSearch}>
+          <IconSearch size={16} />
+          <input
+            type="search"
+            className={s.docSearchInput}
+            placeholder="Search documents..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            aria-label="Search documents"
+          />
+        </div>
+
+        <div className={s.sortControl}>
+          <span className={s.sortLabel}>Sort by</span>
+          <select className={s.sortSelect} defaultValue="latest" aria-label="Sort documents">
+            <option value="latest">Latest</option>
+            <option value="oldest">Oldest</option>
+            <option value="name">Name</option>
+          </select>
         </div>
       </div>
 
       {/* ── Document table ─────────────────── */}
-      <div className={s.section}>
+      <div className={`${s.section} ${s.docListSection}`}>
         <div className={s.docList}>
-          {filtered.map((doc) => {
-            const actionable = doc.status === 'needs-update' || doc.status === 'add';
-            return (
+          {filtered.map((doc) => (
             <div
               key={doc.name}
-              className={`${s.docRowFull} ${actionable ? s.docRowActionable : ''}`}
-              onClick={actionable ? () => setUpdateDoc(doc) : undefined}
-              role={actionable ? 'button' : undefined}
-              tabIndex={actionable ? 0 : undefined}
-              onKeyDown={actionable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setUpdateDoc(doc); } } : undefined}
+              className={`${s.docRowFull} ${doc.status === 'needs-update' ? s.docRowNeedsUpdate : ''}`}
             >
-              <div className={s.docIcon}><IconFile size={18} /></div>
+              <div
+                className={`${s.docIcon} ${
+                  doc.status === 'needs-update' ? s.docIconDanger :
+                  doc.status === 'missing' ? s.docIconWarning : ''
+                }`}
+              >
+                <IconFile size={18} />
+              </div>
               <div className={s.docInfoFull}>
                 <div className={s.docName}>{doc.name}</div>
                 <div className={s.docDate}>{doc.desc}</div>
               </div>
-              <div className={s.docDateCol}>{doc.date}</div>
+              <div className={s.docCategoryCol}>
+                <span className={s.docCategoryPill}>{doc.category}</span>
+              </div>
+              <div className={s.docDateCol}>
+                {doc.date ? (
+                  <><IconCalendar size={13} /> {doc.date}</>
+                ) : (
+                  <span className={s.docDateNone}>&mdash;</span>
+                )}
+              </div>
               <div className={s.docStatusCol}>
                 {doc.status === 'added' && (
                   <span className={s.docStatusAdded}>
@@ -344,21 +384,32 @@ function DocumentsTab() {
                   </span>
                 )}
                 {doc.status === 'needs-update' && (
-                  <span className={s.docStatusNeedsUpdateFull}>
-                    <span className={s.docStatusNeedsUpdate}>
-                      <IconAlertTriangle size={14} /> Needs update
-                    </span>
-                    <button className={s.docUpdateBtn} onClick={() => setUpdateDoc(doc)}>Update &rarr;</button>
+                  <span className={s.docStatusNeedsUpdate}>
+                    <IconAlertTriangle size={14} /> Needs update
                   </span>
                 )}
-                {doc.status === 'add' && (
-                  <span className={s.docStatusAdd}>Add</span>
+                {doc.status === 'missing' && (
+                  <span className={s.docStatusMissing}>
+                    <IconAlertCircle size={14} /> Missing
+                  </span>
                 )}
               </div>
-              <span className={s.docChevron}><IconChevronRight size={16} /></span>
+              <div className={s.docActionCol}>
+                {doc.status === 'added' && (
+                  <Button variant="secondary" size="sm" onClick={() => setPreviewDoc(doc)}>View</Button>
+                )}
+                {doc.status === 'needs-update' && (
+                  <Button variant="danger" size="sm" onClick={() => setUpdateDoc(doc)}>Update</Button>
+                )}
+                {doc.status === 'missing' && (
+                  <Button variant="secondary" size="sm" onClick={() => setUpdateDoc(doc)}>Add document</Button>
+                )}
+              </div>
+              <button className={s.docMenuBtn} aria-label={`More options for ${doc.name}`}>
+                <IconMoreHorizontal size={18} />
+              </button>
             </div>
-            );
-          })}
+          ))}
         </div>
       </div>
 
@@ -411,7 +462,83 @@ function DocumentsTab() {
       </div>
 
       <DocumentUpdateModal doc={updateDoc} onClose={() => setUpdateDoc(null)} />
+      <DocumentPreviewModal doc={previewDoc} onClose={() => setPreviewDoc(null)} />
     </>
+  );
+}
+
+function DocumentPreviewContent({ doc }) {
+  const yearMatch = doc.date?.match(/\d{4}/);
+  const title = yearMatch ? `${doc.name} (${yearMatch[0]})` : doc.name;
+
+  return (
+    <>
+      <div className={s.pmHeader}>
+        <div className={s.pmHeaderIcon}><IconFileText size={20} /></div>
+        <div className={s.pmHeaderText}>
+          <h2 className={s.pmHeading}>{title}</h2>
+          <p className={s.pmSubtext}>We&apos;re unable to show a preview right now</p>
+        </div>
+      </div>
+
+      <div className={s.pmBody}>
+        <div className={s.pmPreviewBox}>
+          <div className={s.pmPreviewIconWrap}>
+            <IconFile size={32} />
+            <span className={s.pmPreviewBadge}>
+              <IconExclamation size={13} />
+            </span>
+          </div>
+          <div className={s.pmPreviewTitle}>Preview isn&apos;t available right now</div>
+          <p className={s.pmPreviewDesc}>
+            You can still download the file to view it.
+          </p>
+          <Button variant="danger" icon={IconDownload} fullWidth>
+            Download document
+          </Button>
+          <div className={s.pmMeta}>PDF &middot; 2.4 MB</div>
+        </div>
+
+        <div className={s.pmInfoBox}>
+          <div className={s.pmInfoIcon}><IconInfo size={18} /></div>
+          <div>
+            <div className={s.pmInfoTitle}>What&apos;s happening?</div>
+            <div className={s.pmInfoDesc}>
+              We&apos;re facing a temporary issue while generating document previews.
+              Our team is working on it, and preview should be available soon.
+            </div>
+          </div>
+        </div>
+
+        <div className={s.pmDivider} />
+
+        <div className={s.pmHelp}>
+          <div className={s.pmHelpIcon}><IconHeadphones size={18} /></div>
+          <div className={s.pmHelpBody}>
+            <div className={s.pmHelpTitle}>Need help?</div>
+            <div className={s.pmHelpDesc}>
+              Still unable to open the file? You can try again later or contact our support team.
+            </div>
+          </div>
+          <Button variant="secondary" size="sm" iconRight={IconExternalLink}>
+            Contact support
+          </Button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function DocumentPreviewModal({ doc, onClose }) {
+  if (!doc) return null;
+
+  return (
+    <Modal open={!!doc} onClose={onClose} bare className={s.previewModal}>
+      <button className={s.umClose} onClick={onClose} aria-label="Close">
+        <IconX size={20} />
+      </button>
+      <DocumentPreviewContent doc={doc} />
+    </Modal>
   );
 }
 
@@ -426,6 +553,7 @@ function DocumentUpdateModal({ doc, onClose }) {
   const [saved, setSaved] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [terraAsked, setTerraAsked] = useState(false);
+  const [previewing, setPreviewing] = useState(false);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -433,11 +561,29 @@ function DocumentUpdateModal({ doc, onClose }) {
     setSaved(false);
     setDragActive(false);
     setTerraAsked(false);
+    setPreviewing(false);
   }, [doc]);
 
   if (!doc) return null;
 
-  const isAdd = doc.status === 'add';
+  if (previewing) {
+    return (
+      <Modal open={!!doc} onClose={onClose} bare className={s.updateModal}>
+        <button className={s.umClose} onClick={onClose} aria-label="Close">
+          <IconX size={20} />
+        </button>
+        <div className={s.umPreviewBar}>
+          <button className={s.umBackBtn} onClick={() => setPreviewing(false)}>
+            <IconChevronRight size={16} style={{ transform: 'rotate(180deg)' }} />
+            Back
+          </button>
+        </div>
+        <DocumentPreviewContent doc={doc} />
+      </Modal>
+    );
+  }
+
+  const isAdd = doc.status === 'missing';
   const u = doc.update || {};
   const heading = isAdd
     ? `Add ${doc.name.toLowerCase()}`
@@ -498,7 +644,7 @@ function DocumentUpdateModal({ doc, onClose }) {
                   <div className={s.umCardIcon}><IconFile size={16} /></div>
                   <div className={s.umCardKind}>{u.before.kind}</div>
                   <div className={s.umCardHeadline}>{u.before.headline}</div>
-                  <Button variant="secondary" size="sm" className={s.umCardBtn}>View</Button>
+                  <Button variant="secondary" size="sm" className={s.umCardBtn} onClick={() => setPreviewing(true)}>View</Button>
                 </div>
                 <div className={s.umArrow}><IconChevronRight size={20} /></div>
                 <div className={`${s.umCard} ${s.umCardNew}`}>
