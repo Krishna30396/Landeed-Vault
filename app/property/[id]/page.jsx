@@ -295,10 +295,9 @@ function OverviewTab({ property }) {
   );
 }
 
-function DocumentsTab() {
+function DocumentsTab({ onUpdateDoc }) {
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [updateDoc, setUpdateDoc] = useState(null);
   const [previewDoc, setPreviewDoc] = useState(null);
 
   const byFilter = activeFilter === 'all' ? DOCUMENTS : DOCUMENTS.filter((d) => d.status === activeFilter);
@@ -399,10 +398,10 @@ function DocumentsTab() {
                   <Button variant="secondary" size="sm" onClick={() => setPreviewDoc(doc)}>View</Button>
                 )}
                 {doc.status === 'needs-update' && (
-                  <Button variant="danger" size="sm" onClick={() => setUpdateDoc(doc)}>Update</Button>
+                  <Button variant="danger" size="sm" onClick={() => onUpdateDoc(doc)}>Update</Button>
                 )}
                 {doc.status === 'missing' && (
-                  <Button variant="secondary" size="sm" onClick={() => setUpdateDoc(doc)}>Add document</Button>
+                  <Button variant="secondary" size="sm" onClick={() => onUpdateDoc(doc)}>Add document</Button>
                 )}
               </div>
               <button className={s.docMenuBtn} aria-label={`More options for ${doc.name}`}>
@@ -461,8 +460,7 @@ function DocumentsTab() {
         </a>
       </div>
 
-      <DocumentUpdateModal doc={updateDoc} onClose={() => setUpdateDoc(null)} />
-      <DocumentPreviewModal doc={previewDoc} onClose={() => setPreviewDoc(null)} />
+     <DocumentPreviewModal doc={previewDoc} onClose={() => setPreviewDoc(null)} />
     </>
   );
 }
@@ -969,6 +967,7 @@ function ActivityTab({ property }) {
 export default function PropertyPage({ params }) {
   const { id } = params;
   const [activeTab, setActiveTab] = useState('Documents');
+  const [updateDoc, setUpdateDoc] = useState(null);
   const property = PROPERTIES[id] || PROPERTIES[2];
 
   return (
@@ -1051,12 +1050,20 @@ export default function PropertyPage({ params }) {
               <div className={s.alertTitle}>{property.alert.title}</div>
               <div className={s.alertDesc}>{property.alert.desc}</div>
             </div>
-            <div className={s.alertAction}>
-              <button className={s.alertBtn}>
-                {property.alert.action}
-                <span>&rarr;</span>
-              </button>
-            </div>
+           <div className={s.alertAction}>
+            <button
+              className={s.alertBtn}
+              onClick={() => {
+                const taxReceipt = DOCUMENTS.find(
+                  (doc) => doc.name === 'Property tax receipt'
+                );
+                setUpdateDoc(taxReceipt);
+              }}
+            >
+              {property.alert.action}
+              <span>&rarr;</span>
+            </button>
+          </div>
           </div>
         )}
 
@@ -1076,9 +1083,12 @@ export default function PropertyPage({ params }) {
 
         <div key={activeTab} className={s.tabPanel}>
           {activeTab === 'Overview' && <OverviewTab property={property} />}
-          {activeTab === 'Documents' && <DocumentsTab />}
+          {activeTab === 'Documents' && <DocumentsTab onUpdateDoc={setUpdateDoc} />}
           {activeTab === 'Government records' && <GovernmentRecordsTab property={property} />}
           {activeTab === 'Activity' && <ActivityTab property={property} />}
+        </div>
+
+        <DocumentUpdateModal doc={updateDoc} onClose={() => setUpdateDoc(null)} />
         </div>
       </main>
     </div>
