@@ -162,10 +162,10 @@ export default function DashboardPage() {
                 We found a new property record in government data.
               </div>
             </div>
-            <button className={s.attentionReviewBtn}>
+            <a href="/property/2" className={s.attentionReviewBtn}>
               Review now
               <span aria-hidden="true">&rarr;</span>
-            </button>
+            </a>
             <button
               className={s.attentionDismiss}
               aria-label="Dismiss notification"
