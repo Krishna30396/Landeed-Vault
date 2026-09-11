@@ -1089,7 +1089,6 @@ export default function PropertyPage({ params }) {
         </div>
 
         <DocumentUpdateModal doc={updateDoc} onClose={() => setUpdateDoc(null)} />
-        </div>
       </main>
     </div>
   );
